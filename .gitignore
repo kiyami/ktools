@@ -1,0 +1,56 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =====================
+# Virtual environments
+# =====================
+venv/
+env/
+.venv/
+conda-env/
+.env/
+
+# =====================
+# PyInstaller
+# =====================
+build/
+dist/
+*.spec
+
+# PyInstaller cache
+*.manifest
+*.log
+
+# =====================
+# IDE
+# =====================
+.vscode/
+.idea/
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Jupyter (if used later)
+# =====================
+.ipynb_checkpoints/
+
+# =====================
+# Qt / PySide2 leftovers
+# =====================
+*.qmlc
+*.jsc
+
+# =====================
+# Project-specific temp
+# =====================
+*.tmp
+*.bak
