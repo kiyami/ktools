@@ -1,14 +1,14 @@
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 
-class RightPanel(QWidget):
+class DataPanel(QWidget):
     def __init__(self):
         super().__init__()
 
         layout = QVBoxLayout(self)
 
-        self.title = QLabel("Results")
-        self.output = QLabel("-")
+        self.title = QLabel("Data")
+        self.output = QLabel("my data")
         self.output.setWordWrap(True)
 
         layout.addWidget(self.title)

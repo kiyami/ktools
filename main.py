@@ -1,12 +1,12 @@
 import sys
-from PySide2.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 from ui.main_window import MainWindow
 
 import matplotlib
-matplotlib.use("Qt5Agg")
+matplotlib.use("qtagg")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

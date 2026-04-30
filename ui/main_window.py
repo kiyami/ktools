@@ -1,9 +1,10 @@
 import numpy as np
 
-from PySide2.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout
 
-from ui.left_panel import LeftPanel
-from ui.right_panel import RightPanel
+from ui.control_panel import ControlPanel
+from ui.results_panel import ResultsPanel
+from ui.data_panel import DataPanel
 from ui.menu_bar import create_menu_bar
 from ui.tool_bar import create_tool_bar
 
@@ -16,7 +17,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Scientific Plot Tool")
+        self.setWindowTitle("k-Tools")
         self.resize(1300, 800)
 
         # ======================
@@ -35,13 +36,21 @@ class MainWindow(QMainWindow):
 
         body = QHBoxLayout()
 
-        self.left = LeftPanel()
-        self.canvas = PlotCanvas()
-        self.right = RightPanel()
+        self.control = ControlPanel()
+        self.results = ResultsPanel()
+        self.canvas  = PlotCanvas()
 
-        body.addWidget(self.left, stretch=1)
+        self.left = QVBoxLayout()
+        self.left.addWidget(self.control, stretch=1)
+        self.left.addWidget(self.results, stretch=1)
+
+        self.data = DataPanel()
+        self.right = QVBoxLayout()
+        self.right.addWidget(self.data, stretch=1)
+
+        body.addLayout(self.left, stretch=1)
         body.addWidget(self.canvas, stretch=3)
-        body.addWidget(self.right, stretch=1)
+        body.addWidget(self.data, stretch=1)
 
         layout.addLayout(body)
 
@@ -62,10 +71,10 @@ class MainWindow(QMainWindow):
 
     def _connect_signals(self):
         # LEFT PANEL
-        self.left.plot_clicked.connect(self.plot_data)
-        self.left.fit_clicked.connect(self.fit_data)
-        self.left.peaks_clicked.connect(self.find_peaks)
-        self.left.clear_clicked.connect(self.clear)
+        self.control.plot_clicked.connect(self.plot_data)
+        self.control.fit_clicked.connect(self.fit_data)
+        self.control.peaks_clicked.connect(self.find_peaks)
+        self.control.clear_clicked.connect(self.clear)
 
         # TOOLBAR
         self.action_plot.triggered.connect(self.plot_data)
@@ -78,7 +87,7 @@ class MainWindow(QMainWindow):
     # ======================
     def plot_data(self):
         self.canvas.plot_data(self.x, self.y)
-        self.right.set_text("Data plotted")
+        self.results.set_text("Data plotted")
 
     def fit_data(self):
         params = fit_gaussian(self.x, self.y)
@@ -86,7 +95,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.plot_fit(self.x, y_fit)
 
-        self.right.set_text(
+        self.results.set_text(
             f"A={params[0]:.2f}\n"
             f"x0={params[1]:.2f}\n"
             f"sigma={params[2]:.2f}"
@@ -95,12 +104,12 @@ class MainWindow(QMainWindow):
     def find_peaks(self):
         peaks = detect_peaks(self.y, height=1)
         self.canvas.plot_peaks(self.x, self.y, peaks)
-        self.right.set_text(f"Peaks: {len(peaks)}")
+        self.results.set_text(f"Peaks: {len(peaks)}")
 
     def clear(self):
         self.canvas.ax.clear()
         self.canvas.draw()
-        self.right.set_text("-")
+        self.results.set_text("-")
 
     # status helper (çok önerilir)
     def set_status(self, text):

@@ -6,7 +6,7 @@ dependencies:
   - numpy
   - scipy
   - matplotlib
-  - pyside2
+  - pyside6
   - pip
   - pip:
       - pyinstaller

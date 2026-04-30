@@ -1,8 +1,8 @@
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QPushButton
-from PySide2.QtCore import Signal
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PySide6.QtCore import Signal
 
 
-class LeftPanel(QWidget):
+class ControlPanel(QWidget):
     plot_clicked = Signal()
     fit_clicked = Signal()
     peaks_clicked = Signal()
@@ -25,7 +25,7 @@ class LeftPanel(QWidget):
         layout.addStretch()
 
         # signals
-        self.btn_plot.clicked.connect(self.plot_clicked)
-        self.btn_fit.clicked.connect(self.fit_clicked)
-        self.btn_peaks.clicked.connect(self.peaks_clicked)
-        self.btn_clear.clicked.connect(self.clear_clicked)
+        self.btn_plot.clicked.connect(self.plot_clicked.emit)
+        self.btn_fit.clicked.connect(self.fit_clicked.emit)
+        self.btn_peaks.clicked.connect(self.peaks_clicked.emit)
+        self.btn_clear.clicked.connect(self.clear_clicked.emit)

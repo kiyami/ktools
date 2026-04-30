@@ -1,4 +1,5 @@
-from PySide2.QtWidgets import QToolBar, QAction
+from PySide6.QtWidgets import QToolBar
+from PySide6.QtGui import QAction
 
 
 def create_tool_bar(window):
