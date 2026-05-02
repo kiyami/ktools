@@ -10,13 +10,10 @@ class DataTableView(QWidget):
         super().__init__()
 
         self.table = QTableView()
-        self.model = DataTableModel()
-
-        self.table.setModel(self.model)
 
         layout = QVBoxLayout()
         layout.addWidget(self.table)
         self.setLayout(layout)
 
-    def set_data(self, cols, names):
-        self.model.set_data(cols, names)
+    def set_model(self, model):
+        self.table.setModel(model)
