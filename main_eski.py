@@ -15,6 +15,10 @@ def main():
     controller = AppController()
     view = controller.start()
 
+    theme = ThemeManager(app)
+    controller.set_theme_manager(theme)
+    theme.apply("light")
+
     window = MainWindow()
     window.setCentralWidget(view)
 

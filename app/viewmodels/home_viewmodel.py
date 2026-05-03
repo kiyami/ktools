@@ -1,25 +1,13 @@
 from PySide6.QtCore import QObject, Signal
-from app.services.data_loader import DataLoader
 
 
 class HomeViewModel(QObject):
 
-    data_loaded = Signal(object)
-    selected_changed = Signal(str)
+    toggle = Signal()
 
     def __init__(self):
         super().__init__()
-        self.loader = DataLoader()
-        self.current_result = None
 
-    def load_file(self, path):
-        result = self.loader.load(path)
-        self.current_result = result
-        self.data_loaded.emit(result)
-
-    def on_cell_selected(self, value):
-        # business logic burada olur
-        self.selected_changed.emit(value)
-
-    def get_data(self):
-        return self.current_result
+    def make_toggle(self):
+        self.toggle.emit()
+        

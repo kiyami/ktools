@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal
 
 
-class CanvasViewModel(QObject):
+class AnalysisViewModel(QObject):
 
     def __init__(self):
         super().__init__()
