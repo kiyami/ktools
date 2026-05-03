@@ -7,26 +7,26 @@ from app.views.components.canvas_view import CanvasView
 
 class HomeView(QWidget):
 
+    theme_clicked = Signal()
     load_clicked = Signal(str)
-    plot_clicked = Signal()
 
     def __init__(self):
         super().__init__()
 
-
         layout = QHBoxLayout()
 
         # canvas layout
-        layout_right = QVBoxLayout()
+        layout_left = QVBoxLayout()
         
         self.canvas_view = CanvasView()
-        self.plot_button = QPushButton("Plot Data")
 
-        layout_right.addWidget(self.canvas_view)
-        layout_right.addWidget(self.plot_button)
+        layout_left.addWidget(self.canvas_view)
 
         # table layout
-        layout_left = QVBoxLayout()
+        layout_right = QVBoxLayout()
+
+        self.theme_button = QPushButton("Toggle Theme")
+        self.theme_button.setProperty
 
         self.load_button = QPushButton("Load Data")
         self.table_view = TableView()
@@ -35,18 +35,19 @@ class HomeView(QWidget):
         self.selected_value.setReadOnly(True)
         self.selected_value.setPlaceholderText("Selected cell value...")
 
-        layout_left.addWidget(self.load_button)
-        layout_left.addWidget(self.table_view)
-        layout_left.addWidget(self.selected_value)
+        layout_right.addWidget(self.load_button)
+        layout_right.addWidget(self.table_view)
+        layout_right.addWidget(self.selected_value)
+        layout_right.addWidget(self.theme_button)
 
         # merge layout
-        layout.addLayout(layout_right,2)
-        layout.addLayout(layout_left,1)
+        layout.addLayout(layout_left,2)
+        layout.addLayout(layout_right,1)
 
         self.setLayout(layout)
 
+        self.theme_button.clicked.connect(self.theme_clicked.emit)
         self.load_button.clicked.connect(self.open_file_dialog)
-        self.plot_button.clicked.connect(self.plot_clicked.emit)
 
     def update_selected_value(self, value: str):
         self.selected_value.setText(f"Selected: {value}")

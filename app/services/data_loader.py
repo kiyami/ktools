@@ -1,106 +1,148 @@
 import numpy as np
 import csv
+import re
 
 from app.models.load_result import LoadResult
 
 
 class DataLoader:
 
+    # =========================
+    # PUBLIC API
+    # =========================
     def load(self, path: str):
 
         try:
             with open(path, "r", encoding="utf-8") as f:
-                lines = f.readlines()
+                lines = [line.rstrip("\n") for line in f]
 
             if not lines:
-                return LoadResult(None, None, "Empty file")
+                return LoadResult(None, None, None, "Empty file")
 
-            # 🔥 burada delimiter hesaplanır
             delimiter = self._detect_delimiter(path, lines)
 
-            # 🔥 BURASI: parsing stratejisi
-            if delimiter is None:
-                reader = [line.strip().split() for line in lines]
-            else:
-                reader = list(csv.reader(lines, delimiter=delimiter))
+            raw = self._parse_raw(lines, delimiter)
 
-            if not reader:
-                return LoadResult(None, None, "Invalid file")
+            if not raw or len(raw) == 0:
+                return LoadResult(None, None, None, "Invalid file")
 
-            first_row = reader[0]
+            headers, data_rows = self._extract_header(raw)
 
-            has_header = self._is_header(first_row)
-
-            if has_header:
-                headers = first_row
-                data = reader[1:]
-            else:
-                headers = [f"Col {i+1}" for i in range(len(first_row))]
-                data = reader
-
-            if not data:
-                return LoadResult(None, None, "No data rows")
+            numeric = self._to_numeric(data_rows)
 
             return LoadResult(
-                data=np.array(data, dtype=object),
+                raw_data=raw,
+                numeric_data=numeric,
                 headers=headers,
                 error=None
             )
 
         except Exception as e:
-            return LoadResult(None, None, str(e))
-        
-    def _detect_delimiter(self, path, lines):
+            return LoadResult(None, None, None, str(e))
 
-        # 🔵 1. küçük sample al
-        sample = "".join(lines[:5])
+    # =========================
+    # PARSING LAYER
+    # =========================
+    def _parse_raw(self, lines, delimiter):
 
-        # 🔵 2. extension hint
-        if path.endswith(".tsv"):
-            return "\t"
+        # CASE 1: structured formats
+        if delimiter is not None:
+            import csv
+            return list(csv.reader(lines, delimiter=delimiter))
 
-        if path.endswith(".csv"):
-            # csv ama ; veya , olabilir
-            pass
+        # CASE 2: whitespace / messy txt
+        return [
+            self._split_whitespace(line)
+            for line in lines
+            if line.strip()
+        ]
 
-        # 🔵 3. içerik analizi (en önemli kısım)
-        delimiters = [",", ";", "\t", "|"]
+    def _split_whitespace(self, line: str):
+        # robust split: multiple spaces + tabs
+        return re.split(r"\s+", line.strip())
 
-        best_delim = ","
-        max_count = 0
+    # =========================
+    # HEADER DETECTION
+    # =========================
+    def _extract_header(self, raw):
 
-        for d in delimiters:
-            counts = [line.count(d) for line in lines[:10]]
-            avg = sum(counts)
+        first = raw[0]
 
-            if avg > max_count:
-                max_count = avg
-                best_delim = d
+        if self._is_header(first):
+            return first, raw[1:]
 
-        # 🔵 4. fallback (whitespace)
-        if max_count == 0:
-            return None  # csv.reader whitespace split yapar
+        headers = [f"Col {i+1}" for i in range(len(first))]
+        return headers, raw
 
-        return best_delim
-    
     def _is_header(self, row):
-        """
-        Basit heuristic:
-        - Eğer ilk satırda sayısal veri varsa header değildir
-        - Eğer string ağırlıklıysa header kabul edilir
-        """
 
         if not row:
             return False
 
-        numeric_score = 0
+        numeric = 0
 
         for cell in row:
             try:
                 float(cell)
-                numeric_score += 1
+                numeric += 1
             except:
                 pass
 
-        # 🔥 çoğu sayıysa header değil
-        return numeric_score < len(row) / 2
+        # çoğu numeric ise header değildir
+        return numeric < len(row) / 2
+
+    # =========================
+    # NUMERIC CONVERSION
+    # =========================
+    def _to_numeric(self, rows):
+
+        if not rows:
+            return None
+
+        cleaned = []
+
+        for row in rows:
+            cleaned.append([self._safe_float(x) for x in row])
+
+        arr = np.array(cleaned, dtype=float)
+
+        if arr.ndim == 1:
+            arr = arr.reshape(-1, 1)
+
+        return arr
+
+    def _safe_float(self, x):
+        try:
+            return float(x)
+        except:
+            return np.nan
+
+    # =========================
+    # DELIMITER DETECTION
+    # =========================
+    def _detect_delimiter(self, path, lines):
+
+        # 1. explicit hints
+        if path.endswith(".tsv"):
+            return "\t"
+
+        # 2. candidate delimiters
+        delimiters = [",", ";", "\t", "|"]
+
+        best = None
+        best_score = 0
+
+        sample_lines = lines[:10]
+
+        for d in delimiters:
+            score = sum(line.count(d) for line in sample_lines)
+
+            if score > best_score:
+                best_score = score
+                best = d
+
+        # 3. fallback: whitespace
+        if best_score == 0:
+            return None
+
+        return best

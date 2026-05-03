@@ -18,5 +18,5 @@ class TableViewModel(QObject):
             print("Error:", result.error)
             return
 
-        self.model.set_data(result.data, result.headers)
+        self.model.set_data(result.raw_data, result.headers)
         self.model_ready.emit(self.model)

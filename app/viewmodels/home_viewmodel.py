@@ -13,9 +13,9 @@ class HomeViewModel(QObject):
         self.current_result = None
 
     def load_file(self, path):
-        load_result = self.loader.load(path)
-        self.current_result = load_result
-        self.data_loaded.emit(load_result)
+        result = self.loader.load(path)
+        self.current_result = result
+        self.data_loaded.emit(result)
 
     def on_cell_selected(self, value):
         # business logic burada olur
