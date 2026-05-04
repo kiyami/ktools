@@ -34,7 +34,7 @@ class AppController:
 
         # load data v->vm
         self.table_view.load_data_clicked.connect(
-            self.table_vm.load_data
+            self.table_vm.open_file_dialog
         )
         # load data vm->v
         self.table_vm.data_loaded.connect(
@@ -63,6 +63,16 @@ class AppController:
         # reset data vm->v
         self.table_vm.table_resetted.connect(
             self.table_view.reset_table
+        )
+
+        # selected row changed
+        self.table_view.selected_row_changed.connect(
+            self.table_vm.update_row_and_table
+        )
+
+        # set model
+        self.table_vm.model_ready.connect(
+            self.table_view.set_model
         )
 
     def start(self):

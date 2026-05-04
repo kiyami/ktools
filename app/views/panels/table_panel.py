@@ -6,14 +6,15 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Signal, Qt
 
 from app.views.components.table_view import TableView
-from app.models.load_result import LoadResult
 
 
 class TablePanel(QWidget):
 
-    load_data_clicked = Signal(str)
+    load_data_clicked = Signal()
     remove_data_clicked = Signal(int)
     reset_clicked = Signal()
+
+    selected_row_changed = Signal(int)
 
     def __init__(self):
         super().__init__()
@@ -76,14 +77,16 @@ class TablePanel(QWidget):
         self.setLayout(main_layout)
 
         # signals
-        self.load_button.clicked.connect(self._send_load_path)
+        self.load_button.clicked.connect(self.load_data_clicked.emit)
         self.remove_button.clicked.connect(self._remove_data_by_index)
         self.reset_button.clicked.connect(self.reset_clicked)
 
-    def update_table(self, data_list: list):
-        print("raw data")
-        print(data_list[0].raw_data)
+        self.table_list.currentRowChanged.connect(self.on_row_changed)
 
+    def set_model(self, model):
+        self.table_view.set_model(model)
+
+    def update_table(self, data_list: list):
         self.table_list.clear()
         self.table_list.addItems(
             item.label for item in data_list
@@ -97,10 +100,6 @@ class TablePanel(QWidget):
         print("ERROR")
         print(message)
 
-    def _send_load_path(self):
-        path = "data path"
-        self.load_data_clicked.emit(path)
-
     def _remove_data_by_index(self):
         index = self.table_list.currentRow()
         self.remove_data_clicked.emit(index)
@@ -110,3 +109,12 @@ class TablePanel(QWidget):
             self.content.setVisible(False)
         else:
             self.content.setVisible(True)
+
+    def get_row(self):
+        return self.table_list.currentRow()
+    
+    def set_row(self, row):
+        self.table_list.setCurrentRow(row)
+
+    def on_row_changed(self):
+        self.selected_row_changed.emit(self.get_row())

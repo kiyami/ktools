@@ -1,6 +1,8 @@
 import numpy as np
+import os
 import csv
 import re
+from pathlib import Path
 
 from app.models.load_result import LoadResult
 
@@ -12,34 +14,35 @@ class DataLoader:
     # =========================
     def load(self, path: str):
 
+        filename = Path(path).stem
+
         try:
             with open(path, "r", encoding="utf-8") as f:
                 lines = [line.rstrip("\n") for line in f]
-
-            if not lines:
-                return LoadResult(None, None, None, "Empty file")
 
             delimiter = self._detect_delimiter(path, lines)
 
             raw = self._parse_raw(lines, delimiter)
 
-            if not raw or len(raw) == 0:
-                return LoadResult(None, None, None, "Invalid file")
+            if not raw:
+                return LoadResult(None, None, None, None, "Invalid file")
 
             headers, data_rows = self._extract_header(raw)
 
+            # 🔥 FIX: numeric sadece data_rows'dan üretilmeli
             numeric = self._to_numeric(data_rows)
 
             return LoadResult(
-                raw_data=raw,
+                label=filename,
+                raw_data=data_rows,   # <- header hariç
                 numeric_data=numeric,
                 headers=headers,
                 error=None
             )
 
         except Exception as e:
-            return LoadResult(None, None, None, str(e))
-
+            return LoadResult(None, None, None, None, str(e))
+        
     # =========================
     # PARSING LAYER
     # =========================
