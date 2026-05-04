@@ -1,16 +1,19 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, 
-    QLineEdit, QSizePolicy, QTextEdit
+    QLineEdit, QSizePolicy, QTextEdit, QLabel
 )
 
 from PySide6.QtCore import Signal, Qt
 
 from app.views.components.table_view import TableView
+from app.views.components.drag_drop_view import DropLabel
+
 
 
 class TablePanel(QWidget):
 
     load_data_clicked = Signal()
+    file_dropped = Signal(str)
     remove_data_clicked = Signal(int)
     reset_clicked = Signal()
 
@@ -28,6 +31,21 @@ class TablePanel(QWidget):
         self.remove_button = QPushButton("Remove Data")
 
         self.reset_button = QPushButton("Reset")
+
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # buradaki style kısmını başka yere taşı
+        self.drag_drop_area = DropLabel("Drag & Drop\nData File")
+        self.drag_drop_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.drag_drop_area.setMinimumHeight(30)
+        self.drag_drop_area.setStyleSheet("""
+            QLabel {
+                border: 2px dashed #888;
+                border-radius: 8px;
+                color: #666;
+                padding: 0px;
+            }
+        """)
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # HEADER LAYOUT
         header = QWidget()
@@ -68,8 +86,8 @@ class TablePanel(QWidget):
         main_layout = QVBoxLayout()
 
         main_layout.addWidget(header, 0)   # sabit alan
-        main_layout.addWidget(self.content, 1)  # büyüyen alan
-        #main_layout.addStretch(1)
+        main_layout.addWidget(self.content, 15)  # büyüyen alan
+        main_layout.addWidget(self.drag_drop_area, 1)
         
         main_layout.setAlignment(Qt.AlignTop)
         main_layout.setContentsMargins(0,0,0,0)
@@ -78,6 +96,7 @@ class TablePanel(QWidget):
 
         # signals
         self.load_button.clicked.connect(self.load_data_clicked.emit)
+        self.drag_drop_area.file_dropped.connect(self.file_dropped)
         self.remove_button.clicked.connect(self._remove_data_by_index)
         self.reset_button.clicked.connect(self.reset_clicked)
 
@@ -107,8 +126,10 @@ class TablePanel(QWidget):
     def set_visibility(self, length: int):
         if length == 0:
             self.content.setVisible(False)
+            self.drag_drop_area.setText("Drag & Drop\nData File")
         else:
             self.content.setVisible(True)
+            self.drag_drop_area.setText("Drag & Drop")
 
     def get_row(self):
         return self.table_list.currentRow()

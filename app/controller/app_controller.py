@@ -36,6 +36,10 @@ class AppController:
         self.table_view.load_data_clicked.connect(
             self.table_vm.open_file_dialog
         )
+        # file dropped v->vm
+        self.table_view.file_dropped.connect(
+            self.table_vm.load_data
+        )
         # load data vm->v
         self.table_vm.data_loaded.connect(
             self.table_view.update_table
