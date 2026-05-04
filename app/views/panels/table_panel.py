@@ -6,31 +6,33 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Signal, Qt
 
 from app.views.components.table_view import TableView
+from app.models.load_result import LoadResult
 
 
 class TablePanel(QWidget):
 
-    toggle_button_clicked = Signal()
+    load_data_clicked = Signal(str)
+    remove_data_clicked = Signal(int)
+    reset_clicked = Signal()
 
     def __init__(self):
         super().__init__()
 
         self.load_button = QPushButton("Load Data")
-        self.toggle_button = QPushButton("Toggle Table")
 
         self.table_view = TableView()
 
-        self.table_list = QTextEdit()
-        self.table_list.setReadOnly(True)
+        self.table_list = QListWidget()
 
         self.remove_button = QPushButton("Remove Data")
+
+        self.reset_button = QPushButton("Reset")
 
         # HEADER LAYOUT
         header = QWidget()
         header_layout = QHBoxLayout()
 
         header_layout.addWidget(self.load_button, 0)
-        header_layout.addWidget(self.toggle_button, 0)
 
         header_layout.setContentsMargins(0,0,0,0)
 
@@ -50,6 +52,7 @@ class TablePanel(QWidget):
         content_layout.addWidget(self.table_view, 5)
         content_layout.addWidget(self.table_list, 1)
         content_layout.addWidget(self.remove_button, 0)
+        content_layout.addWidget(self.reset_button, 0)
 
         content_layout.setContentsMargins(0,0,0,0)
 
@@ -73,8 +76,37 @@ class TablePanel(QWidget):
         self.setLayout(main_layout)
 
         # signals
-        self.toggle_button.clicked.connect(self.toggle_button_clicked.emit)
+        self.load_button.clicked.connect(self._send_load_path)
+        self.remove_button.clicked.connect(self._remove_data_by_index)
+        self.reset_button.clicked.connect(self.reset_clicked)
 
+    def update_table(self, data_list: list):
+        print("raw data")
+        print(data_list[0].raw_data)
 
-    def toggle_table(self):
-        self.content.setVisible(not self.content.isVisible())
+        self.table_list.clear()
+        self.table_list.addItems(
+            item.label for item in data_list
+        )
+
+    def reset_table(self):
+        self.table_view.clear()
+        self.table_list.clear()
+
+    def show_error(self, message):
+        print("ERROR")
+        print(message)
+
+    def _send_load_path(self):
+        path = "data path"
+        self.load_data_clicked.emit(path)
+
+    def _remove_data_by_index(self):
+        index = self.table_list.currentRow()
+        self.remove_data_clicked.emit(index)
+
+    def set_visibility(self, length: int):
+        if length == 0:
+            self.content.setVisible(False)
+        else:
+            self.content.setVisible(True)

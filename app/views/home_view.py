@@ -11,8 +11,6 @@ from app.views.panels.analysis_panel import AnalysisPanel
 
 class HomeView(QWidget):
 
-    toggle_button_clicked = Signal()
-
     def __init__(self):
         super().__init__()
 
@@ -39,7 +37,11 @@ class HomeView(QWidget):
 
         self.setLayout(layout)
 
-        self.table_view.toggle_button_clicked.connect(self.toggle_button_clicked.emit)
-
-    def toggle_table(self):
-        self.table_view.toggle_table()
+    def get_table_view(self):
+        return self.table_view
+    
+    def get_canvas_view(self):
+        return self.canvas_view
+    
+    def get_analysis_view(self):
+        return self.analysis_view

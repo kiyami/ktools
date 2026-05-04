@@ -19,3 +19,6 @@ class TableView(QWidget):
         layout.setContentsMargins(0,0,0,0)
         
         self.setLayout(layout)
+
+    def clear(self):
+        self.table.clear()
