@@ -3,7 +3,7 @@ import numpy as np
 
 
 @dataclass
-class LoadResult:
+class Dataset:
     label: str | None
     raw_data: list[list[str]] | None
     numeric_data: np.ndarray | None

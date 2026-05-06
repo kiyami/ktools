@@ -1,12 +1,14 @@
 from app.views.home_view import HomeView
+
 from app.viewmodels.home_viewmodel import HomeViewModel
 from app.viewmodels.table_viewmodel import TableViewModel
 from app.viewmodels.canvas_viewmodel import CanvasViewModel
 from app.viewmodels.analysis_viewmodel import AnalysisViewModel
 
 from app.services.theme_manager import ThemeManager, Theme
+from app.services.data_service import DataService
 
-from app.models.load_result import LoadResult
+from app.models.dataset import Dataset
 
 
 class AppController:
@@ -22,12 +24,14 @@ class AppController:
         self.analysis_view = self.home_view.get_analysis_view()
 
     def _init_viewmodels(self):
-        self.home_vm = HomeViewModel()
-        self.table_vm = TableViewModel()
-        self.canvas_vm = CanvasViewModel()
-        self.analysis_vm = AnalysisViewModel()
+        self.data_service = DataService()
 
-    def _handle_load_result(self, result: LoadResult):
+        self.home_vm = HomeViewModel()
+        self.table_vm = TableViewModel(self.data_service)
+        self.canvas_vm = CanvasViewModel(self.data_service)
+        self.analysis_vm = AnalysisViewModel(self.data_service)
+
+    def _handle_load_result(self, result: Dataset):
         if result.error:
             self.table_view.show_error(result.error)
         else:
@@ -77,8 +81,12 @@ class AppController:
             self.table_vm.update_row_and_table
         )
 
+        self.table_vm.update_selected_row.connect(
+            self.table_view.set_row
+        )
+
         # set model
-        self.table_vm.model_ready.connect(
+        self.table_vm.model_sended.connect(
             self.table_view.set_model
         )
 
@@ -101,6 +109,7 @@ class AppController:
         self._init_viewmodels()
         self._bind()
 
-        self.table_view.set_visibility(len(self.table_vm.data_list))
+        self.table_vm.send_model()
+        self.table_view.set_visibility(0)
 
         return self.home_view

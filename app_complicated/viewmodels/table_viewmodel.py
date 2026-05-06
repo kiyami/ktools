@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog
 
-from app.models.load_result import LoadResult
+from app.models.dataset import LoadResult
 from app.models.table_model import TableModel
 
 from app.services.data_loader import DataLoader

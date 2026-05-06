@@ -4,7 +4,7 @@ import csv
 import re
 from pathlib import Path
 
-from app.models.load_result import LoadResult
+from app.models.dataset import LoadResult
 
 
 class DataLoader:

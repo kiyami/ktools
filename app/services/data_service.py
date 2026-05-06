@@ -1,14 +1,50 @@
 import numpy as np
-import os
-import csv
 import re
 from pathlib import Path
 
-from app.models.load_result import LoadResult
+from app.models.dataset import Dataset
 
 
-class DataLoader:
+class DataService:
 
+    def __init__(self):
+        self._datasets: list[Dataset] = []
+
+    # ---- write ----
+    def add(self, dataset: Dataset):
+        self._datasets.append(dataset)
+
+    def remove(self, index: int):
+        del self._datasets[index]
+
+    def clear(self):
+        self._datasets.clear()
+
+    # ---- read ----
+    def get_all(self):
+        return self._datasets
+
+    def get(self, index: int):
+        return self._datasets[index]
+    
+    def get_length(self):
+        return len(self._datasets)
+    
+    def get_index(self, dataset: Dataset):
+        return self._datasets.index(dataset)
+
+    def get_headers(self, index: int):
+        return self._datasets[index].headers
+
+    def get_numeric(self, index: int):
+        return self._datasets[index].numeric_data
+    
+    def get_raw(self, index: int):
+        return self._datasets[index].raw_data
+    
+    def get_error(self, index: int):
+        return self._datasets[index].error
+    
     # =========================
     # PUBLIC API
     # =========================
@@ -25,23 +61,27 @@ class DataLoader:
             raw = self._parse_raw(lines, delimiter)
 
             if not raw:
-                return LoadResult(None, None, None, None, "Invalid file")
+                dataset = Dataset(None, None, None, None, "Invalid file")
 
             headers, data_rows = self._extract_header(raw)
 
-            # 🔥 FIX: numeric sadece data_rows'dan üretilmeli
+            # numeric sadece data_rows'dan üretilmeli
             numeric = self._to_numeric(data_rows)
 
-            return LoadResult(
+            dataset = Dataset(
                 label=filename,
-                raw_data=data_rows,   # <- header hariç
+                raw_data=data_rows,
                 numeric_data=numeric,
                 headers=headers,
                 error=None
             )
 
         except Exception as e:
-            return LoadResult(None, None, None, None, str(e))
+            dataset = Dataset(None, None, None, None, str(e))
+
+        self.add(dataset=dataset)
+
+        return dataset
         
     # =========================
     # PARSING LAYER

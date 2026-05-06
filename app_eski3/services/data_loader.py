@@ -2,7 +2,7 @@ import numpy as np
 import csv
 import re
 
-from app.models.load_result import LoadResult
+from app.models.dataset import LoadResult
 
 
 class DataLoader:

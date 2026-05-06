@@ -13,8 +13,11 @@ from app.views.components.drag_drop_view import DropLabel
 class TablePanel(QWidget):
 
     load_data_clicked = Signal()
+
     file_dropped = Signal(str)
+
     remove_data_clicked = Signal(int)
+
     reset_clicked = Signal()
 
     selected_row_changed = Signal(int)
@@ -102,6 +105,19 @@ class TablePanel(QWidget):
 
         self.table_list.currentRowChanged.connect(self.on_row_changed)
 
+    def _remove_data_by_index(self):
+        index = self.table_list.currentRow()
+        self.remove_data_clicked.emit(index)
+
+    def on_row_changed(self):
+        self.selected_row_changed.emit(self.get_row())
+
+    def get_row(self):
+        return self.table_list.currentRow()
+    
+    def set_row(self, row):
+        self.table_list.setCurrentRow(row)
+
     def set_model(self, model):
         self.table_view.set_model(model)
 
@@ -119,10 +135,6 @@ class TablePanel(QWidget):
         print("ERROR")
         print(message)
 
-    def _remove_data_by_index(self):
-        index = self.table_list.currentRow()
-        self.remove_data_clicked.emit(index)
-
     def set_visibility(self, length: int):
         if length == 0:
             self.content.setVisible(False)
@@ -131,11 +143,4 @@ class TablePanel(QWidget):
             self.content.setVisible(True)
             self.drag_drop_area.setText("Drag & Drop")
 
-    def get_row(self):
-        return self.table_list.currentRow()
-    
-    def set_row(self, row):
-        self.table_list.setCurrentRow(row)
 
-    def on_row_changed(self):
-        self.selected_row_changed.emit(self.get_row())
