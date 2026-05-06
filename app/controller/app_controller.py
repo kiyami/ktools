@@ -4,13 +4,16 @@ from app.viewmodels.table_viewmodel import TableViewModel
 from app.viewmodels.canvas_viewmodel import CanvasViewModel
 from app.viewmodels.analysis_viewmodel import AnalysisViewModel
 
+from app.services.theme_manager import ThemeManager, Theme
+
 from app.models.load_result import LoadResult
 
 
 class AppController:
 
-    def __init__(self):
-        self.theme = None
+    def __init__(self, app):
+        self.app = app
+        self.theme = ThemeManager(app)
 
     def _init_views(self):
         self.home_view = HomeView()
@@ -78,6 +81,20 @@ class AppController:
         self.table_vm.model_ready.connect(
             self.table_view.set_model
         )
+
+    # ---------------- WINDOW ----------------
+    def bind_main_window(self, window):
+        self.window = window
+        window.set_theme_manager(self.theme)
+        window.theme_toggled.connect(self._on_theme_toggled)
+
+    def _on_theme_toggled(self, checked: bool):
+        theme = Theme.DARK if checked else Theme.LIGHT
+        self.theme.apply(theme)
+
+        # UI sync controller tarafında
+        config = self.theme.get_config()
+        self.window.theme_btn.setText(config.text)
 
     def start(self):
         self._init_views()

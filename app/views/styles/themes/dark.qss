@@ -1,144 +1,95 @@
-
-/* =========================
-   GLOBAL
-========================= */
+/* ===== BASE ===== */
 QWidget {
-    background-color: #0f1117;
-    color: #e6edf3;
+    background-color: #1e1f22;
+    color: #e6e6e6;
     font-family: "Arial", "Roboto", sans-serif;
     font-size: 13px;
 }
 
-/* =========================
-   PANELS / CARDS
-========================= */
-QWidget#canvasContainer,
-QWidget#tableContainer {
-    background-color: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-}
-
-/* =========================
-   BUTTON BASE
-========================= */
+/* ===== BUTTON ===== */
 QPushButton {
-    background-color: #21262d;
-    border: 1px solid #30363d;
-    padding: 6px 12px;
-    border-radius: 8px;
-    color: #e6edf3;
+    background-color: #2a2d31;
+    border: 1px solid #3a3d42;
+    padding: 6px 10px;
+    border-radius: 6px;
 }
 
 QPushButton:hover {
-    background-color: #30363d;
-    border: 1px solid #484f58;
+    background-color: #34373d;
 }
 
 QPushButton:pressed {
-    background-color: #1a1f24;
+    background-color: #3d4046;
 }
 
-/* =========================
-   PRIMARY BUTTON
-========================= */
-QPushButton[variant="primary"] {
-    background-color: #2f81f7;
-    border: none;
-    color: white;
-}
-
-QPushButton[variant="primary"]:hover {
-    background-color: #1f6feb;
-}
-
-QPushButton[variant="primary"]:pressed {
-    background-color: #1a5fd0;
-}
-
-/* =========================
-   DANGER BUTTON
-========================= */
-QPushButton[variant="danger"] {
-    background-color: #da3633;
-    border: none;
-    color: white;
-}
-
-QPushButton[variant="danger"]:hover {
-    background-color: #b62324;
-}
-
-/* =========================
-   COMBOBOX
-========================= */
-QComboBox {
-    background-color: #0f1117;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 4px 8px;
-    color: #e6edf3;
-}
-
-QComboBox:hover {
-    border: 1px solid #2f81f7;
-}
-
-QComboBox QAbstractItemView {
-    background-color: #161b22;
-    selection-background-color: #1f6feb;
-    selection-color: white;
-}
-
-/* =========================
-   TABLE (Excel dark mode)
-========================= */
+/* ===== TABLE ===== */
 QTableView {
-    background-color: #0f1117;
-    border: 1px solid #30363d;
-    gridline-color: #1f242b;
-    selection-background-color: #1f6feb;
-    selection-color: white;
+    background-color: #232427;
+    gridline-color: #2f3237;
+    border: 1px solid #3a3d42;
+    alternate-background-color: #26282d;
 }
 
 QHeaderView::section {
-    background-color: #161b22;
-    border: 1px solid #30363d;
-    padding: 6px;
-    font-weight: 600;
-    color: #e6edf3;
+    background-color: #2a2d31;
+    border: none;
+    padding: 4px;
 }
 
-/* =========================
-   LIST (plot list)
-========================= */
+/* ===== LIST ===== */
 QListWidget {
-    background-color: #0f1117;
-    border: 1px solid #30363d;
+    background-color: #232427;
+    border: 1px solid #3a3d42;
+}
+
+/* ===== INPUTS ===== */
+QLineEdit, QTextEdit {
+    background-color: #2a2d31;
+    border: 1px solid #3a3d42;
+    border-radius: 6px;
+    padding: 4px;
+    color: #e6e6e6;
+}
+
+QLabel#dropArea {
+    border: 2px dashed #555;
     border-radius: 8px;
-}
-
-QListWidget::item {
+    color: #aaa;
     padding: 6px;
-    color: #e6edf3;
-}
-
-QListWidget::item:selected {
-    background-color: #1f6feb;
-    color: white;
+    background-color: transparent;
 }
 
 /* =========================
-   LINE EDIT
-========================= */
-QLineEdit {
-    background-color: #0f1117;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 5px 8px;
-    color: #e6edf3;
+   LIGHT THEME - TOOLBAR
+   ========================= */
+
+QToolBar {
+    background-color: #1b1c1f;
+    border-bottom: 1px solid #2a2d31;
+    padding: 6px;
 }
 
-QLineEdit:focus {
-    border: 1px solid #2f81f7;
+/* =========================
+   TOOLBUTTON
+   ========================= */
+
+QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #e6e6e6;
+    padding: 4px;
+}
+
+QToolButton:hover {
+    background-color: #2f3237;
+    border-radius: 6px;
+}
+
+QToolButton:pressed {
+    background-color: #3a3d42;
+}
+
+QToolButton:checked {
+    background-color: #40444b;
+    border-radius: 6px;
 }

@@ -5,18 +5,20 @@ matplotlib.use("QtAgg")
 from PySide6.QtWidgets import QApplication
 
 from app.controller.app_controller import AppController
-from app.services.theme_manager import ThemeManager
+from app.services.theme_manager import ThemeManager, Theme
 from app.main_window import MainWindow
 
 
 def main():
     app = QApplication(sys.argv)
 
-    controller = AppController()
+    controller = AppController(app)
     view = controller.start()
 
     window = MainWindow()
     window.setCentralWidget(view)
+
+    controller.bind_main_window(window)
 
     window.show()
 
