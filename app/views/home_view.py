@@ -17,7 +17,7 @@ class HomeView(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QHBoxLayout()
+        self.layout = QHBoxLayout()
 
         # LEFT
         layout_left = QVBoxLayout()
@@ -36,11 +36,14 @@ class HomeView(QWidget):
         self.analysis_view = AnalysisPanel()
         layout_right.addWidget(self.analysis_view)
 
-        layout.addLayout(layout_left,1)
-        layout.addLayout(layout_middle,3)
-        layout.addLayout(layout_right,1)
+        self.layout.addLayout(layout_left,4)
+        self.layout.addLayout(layout_middle,9)
+        self.layout.addLayout(layout_right,3)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
+
+        self.layout.setContentsMargins(12,12,12,12)
+        self.layout.setSpacing(12)
 
         self._setup_console_ui()
 

@@ -30,32 +30,22 @@ class TablePanel(QWidget):
         self.table_view = TableView()
 
         self.table_list = QListWidget()
+        self.table_list.setMinimumHeight(60)
+        self.table_list.setMinimumHeight(40)
 
         self.remove_button = QPushButton("Remove Data")
 
         self.reset_button = QPushButton("Reset")
 
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # buradaki style kısmını başka yere taşı
         self.drag_drop_area = DropLabel("Drag & Drop\nData File")
         self.drag_drop_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.drag_drop_area.setMinimumHeight(30)
-        self.drag_drop_area.setStyleSheet("""
-            QLabel {
-                border: 2px dashed #888;
-                border-radius: 8px;
-                color: #666;
-                padding: 0px;
-            }
-        """)
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # HEADER LAYOUT
         header = QWidget()
         header_layout = QHBoxLayout()
 
         header_layout.addWidget(self.load_button, 0)
-
         header_layout.setContentsMargins(0,0,0,0)
 
         header.setLayout(header_layout)

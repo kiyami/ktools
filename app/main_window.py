@@ -3,10 +3,11 @@ from PySide6.QtWidgets import (
     QToolBar,
     QToolButton,
     QWidget,
-    QSizePolicy
+    QSizePolicy,
 )
 from PySide6.QtGui import QAction
-from PySide6.QtCore import Signal
+
+from PySide6.QtCore import Signal, QSize
 
 from app.services.theme_manager import Theme
 
@@ -21,6 +22,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("k-Tools")
+        self.resize(900, 600)
+        self.setMinimumSize(600, 400)
 
         self._setup_menu()
         self._setup_toolbar()
@@ -29,6 +32,8 @@ class MainWindow(QMainWindow):
     def _setup_menu(self):
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False)
+
+        menubar.setMinimumHeight(30)
 
         file_menu = menubar.addMenu("File")
 
@@ -45,6 +50,9 @@ class MainWindow(QMainWindow):
     def _setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
         self.addToolBar(toolbar)
+
+        toolbar.setMinimumHeight(30)
+        toolbar.setIconSize(QSize(18, 18))
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
