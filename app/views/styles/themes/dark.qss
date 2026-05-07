@@ -93,3 +93,22 @@ QToolButton:checked {
     background-color: #40444b;
     border-radius: 6px;
 }
+
+
+/* =========================
+   CONSOLE - DARK
+   ========================= */
+
+QPlainTextEdit#consoleView {
+    background-color: #1a1d21;
+
+    border: 1px solid #3a3d42;
+    border-radius: 8px;
+
+    padding: 2px;
+
+    color: #d8d8d8;
+
+    selection-background-color: #40444b;
+    selection-color: #ffffff;
+}

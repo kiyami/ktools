@@ -90,6 +90,21 @@ class AppController:
             self.table_view.set_model
         )
 
+        # message area
+        self.home_vm.message_sended.connect(
+            self.home_view.append_text
+        )
+        # log
+        self.table_vm.message_sended.connect(
+            self.home_vm.log
+        )
+        self.canvas_vm.message_sended.connect(
+            self.home_vm.log
+        )
+        self.analysis_vm.message_sended.connect(
+            self.home_vm.log
+        )
+
     # ---------------- WINDOW ----------------
     def bind_main_window(self, window):
         self.window = window

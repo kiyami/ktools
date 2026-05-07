@@ -23,6 +23,8 @@ class TableViewModel(QObject):
 
     model_sended = Signal(object)
 
+    message_sended = Signal(str)
+
     def __init__(self, data_service: DataService):
         super().__init__()
         self.model = TableModel()
@@ -68,6 +70,12 @@ class TableViewModel(QObject):
             self.selected_row = length-1
             self.update_selected_row.emit(length-1)
 
+            message = "File loaded.."
+        else:
+            message = "ERROR: Couldn't load file!"
+
+        self.send_message(message)
+
     def remove_data(self, index):
 
         self.data_service.remove(index)
@@ -107,3 +115,6 @@ class TableViewModel(QObject):
         dataset = self.data_service.get(row)
         self._set_data(dataset)
         self.selected_row_updated.emit(dataset)
+
+    def send_message(self, message: str):
+        self.message_sended.emit(message)
