@@ -94,6 +94,8 @@ class AppController:
     def bind_main_window(self, window):
         self.window = window
         window.set_theme_manager(self.theme)
+        window.open_requested.connect(self.table_vm.open_file_dialog)
+        window.exit_requested.connect(window.close)
         window.theme_toggled.connect(self._on_theme_toggled)
 
     def _on_theme_toggled(self, checked: bool):
