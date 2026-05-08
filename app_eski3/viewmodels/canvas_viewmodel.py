@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Signal
-from app.models.plot_item import PlotItem
+from app.models.plot_model import PlotItem
 
 
 class CanvasViewModel(QObject):

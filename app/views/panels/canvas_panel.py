@@ -9,6 +9,8 @@ from app.views.components.plot_select_view import PlotSelectView
 
 class CanvasPanel(QWidget):
 
+    plot_data_requested = Signal(object)
+
     def __init__(self):
         super().__init__()
 
@@ -64,8 +66,22 @@ class CanvasPanel(QWidget):
 
         self.setLayout(main_layout)
 
+        # signals
+        self.add_plot_button.clicked.connect(self.request_plot_data)
+
     def fill_headers(self, headers):
         self.plot_select.fill_headers(headers)
 
     def reset(self):
         self.plot_select.reset()
+
+    def get_selections(self):
+        return self.plot_select.get_selections()
+
+    def request_plot_data(self):
+        selections = self.plot_select.get_selections()
+        self.plot_data_requested.emit(selections)
+
+    def plot(self, plot_item):
+        self.canvas_view.plot(plot_item)
+

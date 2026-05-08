@@ -6,32 +6,34 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
+from app.models.plot_model import PlotType, PlotSelections
+
 
 plot_types_info = [
     {
-        "key": "line",
         "label": "Line",
-        "cols": ["X", "Y"],
+        "plot_type": PlotType.LINE,
+        "cols": ["x", "y"],
     },
     {
-        "key": "scatter",
         "label": "Scatter",
-        "cols": ["X", "Y"],
+        "plot_type": PlotType.SCATTER,
+        "cols": ["x", "y"],
     },
     {
-        "key": "histogram",
         "label": "Histogram",
-        "cols": ["X"],
+        "plot_type": PlotType.HISTOGRAM,
+        "cols": ["x"],
     },
     {
-        "key": "errorbar",
         "label": "Errorbar",
-        "cols": ["X", "Y", "Xerr", "Yerr"],
+        "plot_type": PlotType.ERRORBAR,
+        "cols": ["x", "y", "xerr", "yerr"],
     },
     {
-        "key": "errorbar_asym",
         "label": "Errorbar (asym)",
-        "cols": ["X", "Y", "Xerr", "Yerr", "Xerr2", "Yerr2"],
+        "plot_type": PlotType.ERRORBAR_ASYM,
+        "cols": ["x", "y", "xerr", "yerr", "xerr2", "yerr2"],
     },
 ]
 
@@ -57,9 +59,10 @@ class PlotSelectView(QWidget):
         label_main = QLabel("Plot Type")
         self.selection_combo = QComboBox()
 
-        self.selection_combo.addItems(
-            item["label"] for item in plot_types_info
-        )
+        for info in plot_types_info:
+            label = info["label"]
+            item  = info["plot_type"]
+            self.selection_combo.addItem(label, item)
 
         # ---------------- ROW 2 ----------------
         label_x = QLabel("X")
@@ -83,19 +86,25 @@ class PlotSelectView(QWidget):
         combo_yerr2 = QComboBox()
 
         # minimum sıkışabilir yapı
-        self.header_combos = [
-            combo_x, combo_y,
-            combo_xerr, combo_yerr,
-            combo_xerr2, combo_yerr2
-        ]
+        self.header_combos = {
+            "x":     combo_x,     "y":     combo_y,
+            "xerr":  combo_xerr,  "yerr":  combo_yerr,
+            "xerr2": combo_xerr2, "yerr2": combo_yerr2
+        }
 
-        self.header_labels = [
-            label_x, label_y,
-            label_xerr, label_yerr,
-            label_xerr2, label_yerr2,
-        ]
+        self.header_labels = {
+            "x":     label_x,     "y":     label_y,
+            "xerr":  label_xerr,  "yerr":  label_yerr,
+            "xerr2": label_xerr2, "yerr2": label_yerr2
+        }
 
-        for combo in self.header_combos + [self.selection_combo]:
+        self.selection_combo.setMinimumWidth(80)
+        self.selection_combo.setSizePolicy(
+            QSizePolicy.MinimumExpanding,
+            QSizePolicy.Fixed
+        )
+
+        for _,combo in self.header_combos.items():
             combo.setMinimumWidth(80)
 
             # sola doğru daralabilsin
@@ -148,12 +157,12 @@ class PlotSelectView(QWidget):
         self.selection_combo.currentIndexChanged.connect(self.set_visibility)
 
     def fill_headers(self, headers):
-        for i,combo in enumerate(self.header_combos):
+        self.headers = headers
+        for label,combo in self.header_combos.items():
             combo.clear()
 
-            # error sütunları boş seçilebilir
-            if i >=2:
-                combo.addItems(["None"])
+            if "err" in label:
+                combo.addItem("None")
 
             combo.addItems(headers)
 
@@ -162,30 +171,41 @@ class PlotSelectView(QWidget):
         if index < 0:
             index = 0
 
-        item = plot_types_info[index]
+        selected_plot_info = plot_types_info[index]
 
-        mask = [
-            "X" in item["cols"],
-            "Y" in item["cols"],
-
-            "Xerr" in item["cols"],
-            "Yerr" in item["cols"],
-
-            "Xerr2" in item["cols"],
-            "Yerr2" in item["cols"],
-        ]
-
-        for m,label,combo in zip(mask, self.header_labels, self.header_combos):
-            if m:
+        for (key, label), (_, combo) in zip(
+                self.header_labels.items(), self.header_combos.items()
+            ):
+            if key in selected_plot_info["cols"]:
                 label.setEnabled(True)
                 combo.setEnabled(True)
             else:
                 label.setEnabled(False)
                 combo.setEnabled(False)
-                combo.setCurrentIndex(0)
+                #combo.setCurrentIndex(0)
 
     def reset(self):
+        self.headers = []
         self.selection_combo.setCurrentIndex(0)
         self.set_visibility(0)
-        for combo in self.header_combos:
+        for combo in self.header_combos.values():
             combo.clear()
+
+    def get_selections(self):
+
+        selections = PlotSelections()
+        selections.plot_type = self.selection_combo.currentData()
+
+        plot_type_index = self.selection_combo.currentIndex()
+        selected_plot_info = plot_types_info[plot_type_index]
+
+        for col in selected_plot_info["cols"]:
+            value = self.header_combos[col].currentText()
+
+            # error sütunlarında "None" seçeneği var, onu None'a çeviriyorum.
+            if value == "None":
+                value = None
+
+            setattr(selections, col, value)
+
+        return selections

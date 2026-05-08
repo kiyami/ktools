@@ -16,6 +16,7 @@ class TableViewModel(QObject):
     data_removed = Signal(object)
 
     selected_row_updated = Signal(object)
+    selected_row_sended = Signal(int)
     update_selected_row = Signal(int)
     
     update_visibility = Signal(int)
@@ -128,3 +129,7 @@ class TableViewModel(QObject):
 
     def send_message(self, message: str):
         self.message_sended.emit(message)
+
+    def send_selected_row(self):
+        if self.selected_row is not None:
+            self.selected_row_sended.emit(self.selected_row)

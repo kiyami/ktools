@@ -112,6 +112,19 @@ class AppController:
         self.table_vm.table_resetted.connect(
             self.canvas_view.reset
         )
+        # plot data request/send
+        self.canvas_view.plot_data_requested.connect(
+            self.canvas_vm.request_selected_row
+        )
+        self.canvas_vm.selected_row_requested.connect(
+            self.table_vm.send_selected_row
+        )
+        self.table_vm.selected_row_sended.connect(
+            self.canvas_vm.get_plot_data
+        )
+        self.canvas_vm.plot_data_sended.connect(
+            self.canvas_view.plot
+        )
 
     # ---------------- WINDOW ----------------
     def bind_main_window(self, window):
