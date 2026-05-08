@@ -105,6 +105,14 @@ class AppController:
             self.home_vm.log
         )
 
+        # plot settings
+        self.table_vm.headers_sended.connect(
+            self.canvas_view.fill_headers
+        )
+        self.table_vm.table_resetted.connect(
+            self.canvas_view.reset
+        )
+
     # ---------------- WINDOW ----------------
     def bind_main_window(self, window):
         self.window = window

@@ -123,8 +123,16 @@ QComboBox {
     min-height: 22px;
 }
 
+QComboBox:disabled {
+    color: rgba(208, 208, 208, 80%);
+}
+
 QLabel {
     min-height: 22px;
+}
+
+QLabel:disabled {
+    color: rgba(208, 208, 208, 80%);
 }
 
 QSplitter::handle {

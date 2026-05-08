@@ -25,6 +25,8 @@ class TableViewModel(QObject):
 
     message_sended = Signal(str)
 
+    headers_sended = Signal(list)
+
     def __init__(self, data_service: DataService):
         super().__init__()
         self.model = TableModel()
@@ -99,8 +101,12 @@ class TableViewModel(QObject):
 
     def reset_table(self):
         self.data_service.clear()
+
         self.table_resetted.emit()
         self.update_visibility.emit(0)
+
+        self.model = TableModel()
+        self.model_sended.emit(self.model)
 
     def update_row_and_table(self, row):
 
@@ -118,6 +124,7 @@ class TableViewModel(QObject):
         dataset = self.data_service.get(row)
         self._set_data(dataset)
         self.selected_row_updated.emit(dataset)
+        self.headers_sended.emit(dataset.headers)
 
     def send_message(self, message: str):
         self.message_sended.emit(message)

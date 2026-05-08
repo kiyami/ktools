@@ -64,5 +64,8 @@ class CanvasPanel(QWidget):
 
         self.setLayout(main_layout)
 
+    def fill_headers(self, headers):
+        self.plot_select.fill_headers(headers)
 
-
+    def reset(self):
+        self.plot_select.reset()
