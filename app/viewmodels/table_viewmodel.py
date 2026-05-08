@@ -94,6 +94,9 @@ class TableViewModel(QObject):
         else:
             self.reset_table()
 
+        message = "Data removed.."
+        self.send_message(message)
+
     def reset_table(self):
         self.data_service.clear()
         self.table_resetted.emit()

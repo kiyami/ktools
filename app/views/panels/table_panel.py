@@ -38,6 +38,7 @@ class TablePanel(QWidget):
         self.reset_button = QPushButton("Reset")
 
         self.drag_drop_area = DropLabel("Drag & Drop\nData File")
+        self.drag_drop_area.setObjectName("dropArea")
         self.drag_drop_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.drag_drop_area.setMinimumHeight(30)
 

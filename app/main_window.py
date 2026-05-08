@@ -46,6 +46,11 @@ class MainWindow(QMainWindow):
         open_action.triggered.connect(self.open_requested.emit)
         exit_action.triggered.connect(self.exit_requested.emit)
 
+
+        edit_menu = menubar.addMenu("Edit")
+        settings_menu = menubar.addMenu("Settings")
+        help_menu = menubar.addMenu("Help")
+
     # ---------------- TOOLBAR ----------------
     def _setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")

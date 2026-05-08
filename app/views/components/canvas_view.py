@@ -21,6 +21,7 @@ class CanvasView(QWidget):
         # ---------------- UI ----------------
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(2,2,2,2)
 
         self.setLayout(layout)
+

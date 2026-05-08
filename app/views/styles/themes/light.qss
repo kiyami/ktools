@@ -47,16 +47,16 @@ QLineEdit, QTextEdit {
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 6px;
-    padding: 4px;
+    padding: 2px;
 }
 
-QLabel#dropArea {
+/* QLabel#dropArea {
     border: 2px dashed #888;
     border-radius: 8px;
     color: #666;
     padding: 6px;
     background-color: transparent;
-}
+} */
 
 /* =========================
    LIGHT THEME - TOOLBAR
@@ -111,9 +111,28 @@ QPlainTextEdit#consoleView {
     selection-color: #111111;
 }
 
-QLabel {
+QLabel#dropArea {
     border: 2px dashed #888;
     border-radius: 8px;
     color: #666;
     padding: 0px;
+}
+
+
+QComboBox {
+    min-height: 22px;
+}
+
+QLabel {
+    min-height: 22px;
+}
+
+QSplitter::handle {
+    background-color: #e0e0e0;
+    width: 2px;   /* vertical splitter */
+    height: 2px;  /* horizontal splitter */
+}
+
+QSplitter::handle:hover {
+    background-color: #bdbdbd;
 }
