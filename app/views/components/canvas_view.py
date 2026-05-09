@@ -133,6 +133,7 @@ class CanvasView(QWidget):
         self.canvas.draw_idle()
 
     def reset(self):
+        self.figure.set_facecolor("white")
         self.ax.clear()
         self.redraw()
         
