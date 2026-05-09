@@ -11,6 +11,17 @@ from app.services.data_service import DataService
 from app.models.dataset import Dataset
 
 
+from app.views.settings_dialog import SettingsDialog
+
+from app.adapters.artist_adapter import ArtistAdapter
+from app.adapters.axis_adapter import AxisAdapter
+from app.adapters.figure_adapter import FigureAdapter
+
+from app.config.plot_settings_config import PLOT_SETTINGS_CONFIG
+from app.config.axis_settings_config import AXIS_SETTINGS_CONFIG
+from app.config.figure_settings_config import FIGURE_SETTINGS_CONFIG
+
+
 class AppController:
 
     def __init__(self, app):
@@ -24,7 +35,7 @@ class AppController:
         self.canvas_view = self.home_view.get_canvas_view()
         self.analysis_view = self.home_view.get_analysis_view()
 
-        self.plot_settings_view = self.home_view.get_plot_settings_view()
+        self.settings_dialog = SettingsDialog()
 
     def _init_viewmodels(self):
         self.data_service = DataService()
@@ -162,14 +173,11 @@ class AppController:
 
         # settings
         self.canvas_view.settings_button_clicked.connect(
-            self.canvas_vm.request_settings_panel
-        )
-        self.canvas_vm.settings_panel_requested.connect(
-            self._open_plot_settings
+            self._open_settings_dialog
         )
 
-        self.plot_settings_view.applied.connect(
-            self._apply_plot_settings
+        self.settings_dialog.applied.connect(
+            self.canvas_view.redraw
         )
 
     # ---------------- WINDOW ----------------
@@ -188,13 +196,66 @@ class AppController:
         config = self.theme.get_config()
         self.window.theme_btn.setText(config.text)
 
-    def _open_plot_settings(self, artist_item):
-        self.plot_settings_view.load(artist_item)
-        self.plot_settings_view.show()
+    def _open_settings_dialog(self):
 
-    def _apply_plot_settings(self, artist_item):
-        artist_item.obj.set(**artist_item.settings)
-        self.canvas_view.redraw()
+        canvas = self.canvas_view.canvas
+        figure = self.canvas_view.figure
+        ax = self.canvas_view.ax
+
+        artist_items = self.canvas_vm.artist_list
+
+        # temizle
+        self.settings_dialog.clear()
+
+        # =====================================================
+        # FIGURE
+        # =====================================================
+
+        self.settings_dialog.add_section(
+            title="Figure",
+            target=figure,
+            config=FIGURE_SETTINGS_CONFIG,
+            adapter=FigureAdapter(),
+        )
+
+        # =====================================================
+        # AXIS
+        # =====================================================
+
+        self.settings_dialog.add_section(
+            title="Axis",
+            target=ax,
+            config=AXIS_SETTINGS_CONFIG,
+            adapter=AxisAdapter(),
+        )
+
+        # =====================================================
+        # ARTISTS
+        # =====================================================
+
+        for i, artist_item in enumerate(artist_items):
+
+            config = PLOT_SETTINGS_CONFIG.get(
+                artist_item.plot_type,
+                [],
+            )
+
+            self.settings_dialog.add_section(
+                title=f"Artist {i+1}",
+                target=artist_item,
+                config=config,
+                adapter=ArtistAdapter(),
+            )
+
+        # =====================================================
+        # APPLY CALLBACK
+        # =====================================================
+        
+        self.settings_dialog.applied.connect(
+            canvas.draw_idle
+        )
+
+        self.settings_dialog.show()
 
     def start(self):
         self._init_views()

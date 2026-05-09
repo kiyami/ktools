@@ -1,4 +1,6 @@
-from PySide6.QtCore import Qt, Signal
+# app/views/property_editor_view.py
+
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QWidget,
     QLabel,
@@ -13,18 +15,15 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
 )
 
-from app.models.plot_model import PlotType, ArtistItem
-
 from app.config.plot_settings_config import (
-    PLOT_SETTINGS_CONFIG,
     FieldType,
     SettingField,
 )
 
 
-class PlotSettingsView(QWidget):
+class PropertyEditorView(QWidget):
 
-    applied = Signal(object)
+    applied = Signal()
     canceled = Signal()
 
     # =====================================================
@@ -34,7 +33,9 @@ class PlotSettingsView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.artist_item = None
+        self.target = None
+        self.config = []
+        self.adapter = None
 
         self.field_widgets = {}
         self.field_labels = {}
@@ -49,33 +50,63 @@ class PlotSettingsView(QWidget):
 
         self.layout = QGridLayout()
 
+        self.setLayout(self.layout)
+
+    # =====================================================
+    # LOAD
+    # =====================================================
+
+    def load(
+        self,
+        target,
+        config,
+        adapter,
+    ):
+
+        self.target = target
+        self.config = config
+        self.adapter = adapter
+
+        self._rebuild()
+
+    # =====================================================
+    # REBUILD
+    # =====================================================
+
+    def _rebuild(self):
+
+        self._clear_layout()
+
+        self.field_widgets.clear()
+        self.field_labels.clear()
+
         row = 0
 
         # -------------------------------------------------
-        # Plot type
+        # FIELDS
         # -------------------------------------------------
 
-        self.combo_type = QComboBox()
-
-        for pt in PlotType:
-            self.combo_type.addItem(pt.value, pt)
-
-        self.layout.addWidget(QLabel("Plot Type"), row, 0)
-        self.layout.addWidget(self.combo_type, row, 1)
-
-        row += 1
-
-        # -------------------------------------------------
-        # Dynamic fields
-        # -------------------------------------------------
-
-        self.all_fields = self._collect_fields()
-
-        for field in self.all_fields:
+        for field in self.config:
 
             label = QLabel(field.label)
 
             widget = self._create_widget(field)
+
+            # existing value
+            value = self.adapter.get(
+                self.target,
+                field.key,
+            )
+
+            # fallback to default
+            if value is None:
+                value = field.default
+
+            self._set_widget_value(
+                widget,
+                field,
+                value,
+            )
 
             self.field_labels[field.key] = label
             self.field_widgets[field.key] = widget
@@ -86,7 +117,7 @@ class PlotSettingsView(QWidget):
             row += 1
 
         # -------------------------------------------------
-        # Buttons
+        # BUTTONS
         # -------------------------------------------------
 
         btn_layout = QHBoxLayout()
@@ -99,33 +130,12 @@ class PlotSettingsView(QWidget):
 
         self.layout.addLayout(btn_layout, row, 0, 1, 2)
 
-        self.setLayout(self.layout)
-
         # -------------------------------------------------
-        # Signals
+        # SIGNALS
         # -------------------------------------------------
-
-        self.combo_type.currentIndexChanged.connect(
-            self._update_visibility
-        )
 
         self.apply_btn.clicked.connect(self._apply)
         self.cancel_btn.clicked.connect(self._cancel)
-
-    # =====================================================
-    # FIELD COLLECTION
-    # =====================================================
-
-    def _collect_fields(self):
-
-        fields = {}
-
-        for field_list in PLOT_SETTINGS_CONFIG.values():
-
-            for field in field_list:
-                fields[field.key] = field
-
-        return list(fields.values())
 
     # =====================================================
     # CREATE WIDGET
@@ -141,12 +151,7 @@ class PlotSettingsView(QWidget):
 
         if t == FieldType.TEXT:
 
-            w = QLineEdit()
-
-            if field.default is not None:
-                w.setText(str(field.default))
-
-            return w
+            return QLineEdit()
 
         # -------------------------------------------------
         # FLOAT
@@ -167,9 +172,6 @@ class PlotSettingsView(QWidget):
             if field.step is not None:
                 w.setSingleStep(field.step)
 
-            if field.default is not None:
-                w.setValue(float(field.default))
-
             return w
 
         # -------------------------------------------------
@@ -186,9 +188,6 @@ class PlotSettingsView(QWidget):
             if field.max is not None:
                 w.setMaximum(int(field.max))
 
-            if field.default is not None:
-                w.setValue(int(field.default))
-
             return w
 
         # -------------------------------------------------
@@ -197,12 +196,7 @@ class PlotSettingsView(QWidget):
 
         elif t == FieldType.BOOL:
 
-            w = QCheckBox()
-
-            if field.default is not None:
-                w.setChecked(bool(field.default))
-
-            return w
+            return QCheckBox()
 
         # -------------------------------------------------
         # COMBO
@@ -216,13 +210,6 @@ class PlotSettingsView(QWidget):
                 for opt in field.options:
                     w.addItem(str(opt), opt)
 
-            if field.default is not None:
-
-                idx = w.findData(field.default)
-
-                if idx >= 0:
-                    w.setCurrentIndex(idx)
-
             return w
 
         # -------------------------------------------------
@@ -233,72 +220,17 @@ class PlotSettingsView(QWidget):
 
             w = QPushButton()
 
-            color = field.default or "#ffffff"
-
-            w.setText(color)
-
-            self._set_button_color(w, color)
-
             w.clicked.connect(
                 lambda _, btn=w: self._pick_color(btn)
             )
 
             return w
 
-        # fallback
+        # -------------------------------------------------
+        # FALLBACK
+        # -------------------------------------------------
+
         return QLineEdit()
-
-    # =====================================================
-    # LOAD
-    # =====================================================
-
-    def load(self, artist_item: ArtistItem):
-
-        self.artist_item = artist_item
-
-        # set plot type
-        idx = self.combo_type.findData(artist_item.plot_type)
-
-        if idx >= 0:
-            self.combo_type.setCurrentIndex(idx)
-
-        settings = artist_item.settings or {}
-
-        # load values
-        for field in self.all_fields:
-
-            key = field.key
-
-            if key not in settings:
-                continue
-
-            value = settings[key]
-
-            widget = self.field_widgets[key]
-
-            self._set_widget_value(widget, field, value)
-
-        self._update_visibility()
-
-    # =====================================================
-    # VISIBILITY
-    # =====================================================
-
-    def _update_visibility(self):
-
-        plot_type = self.combo_type.currentData()
-
-        allowed = {
-            field.key
-            for field in PLOT_SETTINGS_CONFIG.get(plot_type, [])
-        }
-
-        for field in self.all_fields:
-
-            visible = field.key in allowed
-
-            self.field_labels[field.key].setVisible(visible)
-            self.field_widgets[field.key].setVisible(visible)
 
     # =====================================================
     # APPLY
@@ -306,26 +238,25 @@ class PlotSettingsView(QWidget):
 
     def _apply(self):
 
-        if self.artist_item is None:
+        if self.target is None:
             return
 
-        self.artist_item.plot_type = self.combo_type.currentData()
+        for field in self.config:
 
-        settings = {}
+            widget = self.field_widgets[field.key]
 
-        for field in self.all_fields:
-
-            if not self.field_widgets[field.key].isVisible():
-                continue
-
-            settings[field.key] = self._get_widget_value(
-                self.field_widgets[field.key],
+            value = self._get_widget_value(
+                widget,
                 field,
             )
 
-        self.artist_item.settings = settings
+            self.adapter.set(
+                self.target,
+                field.key,
+                value,
+            )
 
-        self.applied.emit(self.artist_item)
+        self.applied.emit()
 
     # =====================================================
     # CANCEL
@@ -345,22 +276,52 @@ class PlotSettingsView(QWidget):
 
         t = field.field_type
 
+        # -------------------------------------------------
+        # TEXT
+        # -------------------------------------------------
+
         if t == FieldType.TEXT:
+
             return widget.text()
 
+        # -------------------------------------------------
+        # FLOAT
+        # -------------------------------------------------
+
         elif t == FieldType.FLOAT:
+
             return widget.value()
+
+        # -------------------------------------------------
+        # INT
+        # -------------------------------------------------
 
         elif t == FieldType.INT:
+
             return widget.value()
 
+        # -------------------------------------------------
+        # BOOL
+        # -------------------------------------------------
+
         elif t == FieldType.BOOL:
+
             return widget.isChecked()
 
+        # -------------------------------------------------
+        # COMBO
+        # -------------------------------------------------
+
         elif t == FieldType.COMBO:
+
             return widget.currentData()
 
+        # -------------------------------------------------
+        # COLOR
+        # -------------------------------------------------
+
         elif t == FieldType.COLOR:
+
             return widget.text()
 
         return None
@@ -369,28 +330,53 @@ class PlotSettingsView(QWidget):
     # SET VALUE
     # =====================================================
 
-    def _set_widget_value(self, widget, field, value):
-
-        t = field.field_type
+    def _set_widget_value(
+        self,
+        widget,
+        field,
+        value,
+    ):
 
         if value is None:
             return
+
+        t = field.field_type
+
+        # -------------------------------------------------
+        # TEXT
+        # -------------------------------------------------
 
         if t == FieldType.TEXT:
 
             widget.setText(str(value))
 
+        # -------------------------------------------------
+        # FLOAT
+        # -------------------------------------------------
+
         elif t == FieldType.FLOAT:
 
             widget.setValue(float(value))
+
+        # -------------------------------------------------
+        # INT
+        # -------------------------------------------------
 
         elif t == FieldType.INT:
 
             widget.setValue(int(value))
 
+        # -------------------------------------------------
+        # BOOL
+        # -------------------------------------------------
+
         elif t == FieldType.BOOL:
 
             widget.setChecked(bool(value))
+
+        # -------------------------------------------------
+        # COMBO
+        # -------------------------------------------------
 
         elif t == FieldType.COMBO:
 
@@ -399,13 +385,21 @@ class PlotSettingsView(QWidget):
             if idx >= 0:
                 widget.setCurrentIndex(idx)
 
+        # -------------------------------------------------
+        # COLOR
+        # -------------------------------------------------
+
         elif t == FieldType.COLOR:
 
             widget.setText(str(value))
-            self._set_button_color(widget, str(value))
+
+            self._set_button_color(
+                widget,
+                str(value),
+            )
 
     # =====================================================
-    # COLOR
+    # COLOR PICKER
     # =====================================================
 
     def _pick_color(self, button):
@@ -419,9 +413,16 @@ class PlotSettingsView(QWidget):
 
         button.setText(hex_color)
 
-        self._set_button_color(button, hex_color)
+        self._set_button_color(
+            button,
+            hex_color,
+        )
 
-    def _set_button_color(self, button, color):
+    def _set_button_color(
+        self,
+        button,
+        color,
+    ):
 
         button.setStyleSheet(f"""
             QPushButton {{
@@ -430,3 +431,31 @@ class PlotSettingsView(QWidget):
                 min-height: 24px;
             }}
         """)
+
+    # =====================================================
+    # CLEAR
+    # =====================================================
+
+    def _clear_layout(self):
+
+        while self.layout.count():
+
+            item = self.layout.takeAt(0)
+
+            widget = item.widget()
+
+            if widget is not None:
+                widget.deleteLater()
+
+            child_layout = item.layout()
+
+            if child_layout is not None:
+
+                while child_layout.count():
+
+                    child_item = child_layout.takeAt(0)
+
+                    child_widget = child_item.widget()
+
+                    if child_widget is not None:
+                        child_widget.deleteLater()

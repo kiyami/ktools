@@ -86,6 +86,11 @@ class CanvasPanel(QWidget):
 
         self.canvas_view.artist_plotted.connect(self.artist_plotted.emit)
 
+        # fig objects from inner layer
+        self.figure = self.canvas_view.figure
+        self.canvas = self.canvas_view.canvas
+        self.ax = self.canvas_view.ax
+
     def fill_headers(self, headers):
         self.plot_select.fill_headers(headers)
 
