@@ -10,10 +10,19 @@ class CanvasViewModel(QObject):
 
     plot_data_sended = Signal(object)
 
+    artist_added = Signal(object)
+
+    artist_removed = Signal(object)
+
+    reset_done = Signal()
+
+    settings_panel_requested = Signal(object)
+
     def __init__(self, data_service: DataService):
         super().__init__()
         self.data_service = data_service
         self.current_selections = None
+        self.artist_list = []
 
     def request_selected_row(self, selections):
         self.current_selections = selections
@@ -44,3 +53,43 @@ class CanvasViewModel(QObject):
 
         else:
             self.message_sended.emit("Invalid data to plot..")
+
+    def add_artist(self, artist_item):
+        self.artist_list.append(artist_item)
+        self.artist_added.emit(self.artist_list)
+
+    def remove_artist(self, index):
+        artist_item = self.artist_list[index]
+        artist_item.remove()
+        del self.artist_list[index]
+        self.artist_removed.emit(self.artist_list)
+
+    def reset(self):
+        for artist_item in self.artist_list:
+            artist_item.remove()
+
+        self.artist_list = []
+
+        self.reset_done.emit()
+
+    def request_settings_panel(self, index):
+        artist_item = self.artist_list[index]
+        self.settings_panel_requested.emit(artist_item)
+
+    # def open_settings_dialog(self, index):
+
+    #     artist_item = self.artist_list[index]
+
+    #     artist = artist_item.obj
+
+    #     plot_type = artist_item.plot_type
+
+    #     initial = artist.properties()
+
+    #     self.plot_settings_view.build(
+    #         plot_type=plot_type,
+    #         initial_values=initial
+    #     )
+
+    #     self.plot_settings_view.show()
+        

@@ -4,13 +4,15 @@ from PySide6.QtWidgets import (
     QPushButton, QComboBox, QListWidget, QListWidgetItem,
 )
 
-from app.models.plot_model import PlotType
+from app.models.plot_model import PlotType, ArtistItem
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
 
 class CanvasView(QWidget):
+
+    artist_plotted = Signal(object)
 
     def __init__(self):
         super().__init__()
@@ -29,6 +31,8 @@ class CanvasView(QWidget):
 
     def plot(self, plot_item):
 
+        artist_item = ArtistItem()
+
         if not plot_item.is_valid():
             return
 
@@ -36,22 +40,46 @@ class CanvasView(QWidget):
             settings = dict()
 
         if plot_item.plot_type == PlotType.LINE:
-            self.ax.plot(plot_item.x, plot_item.y, **settings)
+            artist = self.ax.plot(plot_item.x, plot_item.y, **settings)[0]
+
+            artist_item.plot_type = PlotType.LINE
+            artist_item.label = "Line Plot"
+            artist_item.obj = artist
+            artist_item.misc = None
+
 
         elif plot_item.plot_type == PlotType.SCATTER:
-            self.ax.scatter(x=plot_item.x, y=plot_item.y, **settings)
+            artist = self.ax.scatter(x=plot_item.x, y=plot_item.y, **settings)
+
+            artist_item.plot_type = PlotType.SCATTER
+            artist_item.label = "Scatter Plot"
+            artist_item.obj = artist
+            artist_item.misc = None
 
         elif plot_item.plot_type == PlotType.HISTOGRAM:
-            self.ax.hist(x=plot_item.x, **settings)
+            bin_values, bin_edges, artist = self.ax.hist(x=plot_item.x, **settings)
+
+            artist_item.plot_type = PlotType.HISTOGRAM
+            artist_item.label = "Histogram Plot"
+            artist_item.obj = artist
+            artist_item.misc = {
+                "bin_values": bin_values,
+                "bin_edges": bin_edges,
+            }
 
         elif plot_item.plot_type == PlotType.ERRORBAR:
-            self.ax.errorbar(
+            artist = self.ax.errorbar(
                 x=plot_item.x, 
                 y=plot_item.y, 
                 xerr=plot_item.xerr, 
                 yerr=plot_item.yerr, 
                 **settings
             )
+
+            artist_item.plot_type = PlotType.ERRORBAR
+            artist_item.label = "Errorbar Plot"
+            artist_item.obj = artist
+            artist_item.misc = None
 
         elif plot_item.plot_type == PlotType.ERRORBAR_ASYM:
 
@@ -81,7 +109,7 @@ class CanvasView(QWidget):
                 yerr = [plot_item.yerr,plot_item.yerr2]
             
 
-            self.ax.errorbar(
+            artist = self.ax.errorbar(
                 x=plot_item.x, 
                 y=plot_item.y, 
                 xerr=xerr, 
@@ -89,8 +117,23 @@ class CanvasView(QWidget):
                 **settings
             )
 
+            artist_item.plot_type = PlotType.ERRORBAR_ASYM
+            artist_item.label = "Errorbar (asym) Plot"
+            artist_item.obj = artist
+            artist_item.misc = None
+
         #self.ax.relim()
         #self.ax.autoscale_view()
 
         self.canvas.draw()
+
+        self.artist_plotted.emit(artist_item)
+
+    def redraw(self):
+        self.canvas.draw_idle()
+
+    def reset(self):
+        self.ax.clear()
+        self.redraw()
+        
 

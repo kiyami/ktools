@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, Dict, Any, Sequence
-
+from matplotlib.artist import Artist
 
 # =========================================================
 # ENUM
@@ -16,6 +16,22 @@ class PlotType(Enum):
     ERRORBAR_ASYM = "errorbar_asym"
 
 
+# =========================================================
+# ARTIST
+# =========================================================
+
+@dataclass
+class ArtistItem:
+
+    plot_type: Optional[PlotType] = None
+    label: Optional[str] = None
+    obj: Optional[Artist] = None
+    misc: Optional[object] = None
+    settings: Dict = field(default_factory=dict)
+
+    def remove(self):
+        self.obj.remove()
+    
 # =========================================================
 # BASE
 # =========================================================

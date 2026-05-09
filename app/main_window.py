@@ -22,8 +22,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("k-Tools")
-        self.resize(900, 600)
-        self.setMinimumSize(600, 400)
+        self.resize(900, 700)
+        self.setMinimumSize(700, 500)
 
         self._setup_menu()
         self._setup_toolbar()

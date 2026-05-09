@@ -6,10 +6,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Signal, Qt
 
 from app.views.components.console_view import ConsoleView
+from app.views.components.plot_settings_view import PlotSettingsView
 
 from app.views.panels.table_panel import TablePanel
 from app.views.panels.canvas_panel import CanvasPanel
 from app.views.panels.analysis_panel import AnalysisPanel
+
 
 
 class HomeView(QWidget):
@@ -63,6 +65,8 @@ class HomeView(QWidget):
 
         self._setup_console_ui()
 
+        self.plot_settings_view = PlotSettingsView()
+
     # ---------------- UI ----------------
     def _setup_console_ui(self):
         self.console.setObjectName("consoleView")
@@ -88,3 +92,6 @@ class HomeView(QWidget):
     
     def get_analysis_view(self):
         return self.analysis_view
+    
+    def get_plot_settings_view(self):
+        return self.plot_settings_view

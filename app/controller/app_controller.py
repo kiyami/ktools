@@ -19,9 +19,12 @@ class AppController:
 
     def _init_views(self):
         self.home_view = HomeView()
+
         self.table_view = self.home_view.get_table_view()
         self.canvas_view = self.home_view.get_canvas_view()
         self.analysis_view = self.home_view.get_analysis_view()
+
+        self.plot_settings_view = self.home_view.get_plot_settings_view()
 
     def _init_viewmodels(self):
         self.data_service = DataService()
@@ -125,6 +128,49 @@ class AppController:
         self.canvas_vm.plot_data_sended.connect(
             self.canvas_view.plot
         )
+        # remove plot
+        self.canvas_view.remove_plot_requested.connect(
+            self.canvas_vm.remove_artist
+        )
+        self.canvas_vm.artist_removed.connect(
+            self.canvas_view.update_list
+        )
+
+        # artist
+        self.canvas_view.artist_plotted.connect(
+            self.canvas_vm.add_artist
+        )
+        self.canvas_vm.artist_added.connect(
+            self.canvas_view.update_list
+        )
+        self.canvas_vm.artist_added.connect(
+            self.canvas_view.redraw
+        )
+        self.canvas_vm.artist_removed.connect(
+            self.canvas_view.update_list
+        )
+        self.canvas_vm.artist_removed.connect(
+            self.canvas_view.redraw
+        )
+
+        self.canvas_view.reset_requested.connect(
+            self.canvas_vm.reset
+        )
+        self.canvas_vm.reset_done.connect(
+            self.canvas_view.reset
+        )
+
+        # settings
+        self.canvas_view.settings_button_clicked.connect(
+            self.canvas_vm.request_settings_panel
+        )
+        self.canvas_vm.settings_panel_requested.connect(
+            self._open_plot_settings
+        )
+
+        self.plot_settings_view.applied.connect(
+            self._apply_plot_settings
+        )
 
     # ---------------- WINDOW ----------------
     def bind_main_window(self, window):
@@ -141,6 +187,14 @@ class AppController:
         # UI sync controller tarafında
         config = self.theme.get_config()
         self.window.theme_btn.setText(config.text)
+
+    def _open_plot_settings(self, artist_item):
+        self.plot_settings_view.load(artist_item)
+        self.plot_settings_view.show()
+
+    def _apply_plot_settings(self, artist_item):
+        artist_item.obj.set(**artist_item.settings)
+        self.canvas_view.redraw()
 
     def start(self):
         self._init_views()
