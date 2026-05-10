@@ -125,11 +125,21 @@ class CanvasView(QWidget):
         #self.ax.relim()
         #self.ax.autoscale_view()
 
+        # label varsa legend aç, yoksa açma
+        _, labels = self.ax.get_legend_handles_labels()
+        if any(labels):
+            self.ax.legend()
+
         self.canvas.draw()
 
         self.artist_plotted.emit(artist_item)
 
     def redraw(self):
+        # label varsa legend aç, yoksa açma
+        _, labels = self.ax.get_legend_handles_labels()
+        if any(labels):
+            self.ax.legend()
+            
         self.canvas.draw_idle()
 
     def reset(self):

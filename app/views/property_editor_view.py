@@ -37,8 +37,8 @@ class PropertyEditorView(QWidget):
         self.config = []
         self.adapter = None
 
-        self.field_widgets = {}
-        self.field_labels = {}
+        self.field_widgets: dict[str, QWidget] = {}
+        self.field_labels: dict[str, QLabel] = {}
 
         self._build_ui()
 
@@ -50,11 +50,28 @@ class PropertyEditorView(QWidget):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
 
+        self.apply_btn = QPushButton("Apply")
+        self.cancel_btn = QPushButton("Cancel")
+
+        self.apply_btn.clicked.connect(self._apply)
+        self.cancel_btn.clicked.connect(self._cancel)
+
+        self.layout.setContentsMargins(8, 8, 8, 8)
+        self.layout.setHorizontalSpacing(12)
+        self.layout.setVerticalSpacing(8)
+
     # =====================================================
     # LOAD
     # =====================================================
 
     def load(self, target, config, adapter):
+
+        if target is None:
+            return
+
+        if adapter is None:
+            return
+        
         self.target = target
         self.config = config
         self.adapter = adapter
@@ -96,16 +113,10 @@ class PropertyEditorView(QWidget):
         # buttons
         btn_layout = QHBoxLayout()
 
-        self.apply_btn = QPushButton("Apply")
-        self.cancel_btn = QPushButton("Cancel")
-
         btn_layout.addWidget(self.apply_btn)
         btn_layout.addWidget(self.cancel_btn)
 
         self.layout.addLayout(btn_layout, row, 0, 1, 2)
-
-        self.apply_btn.clicked.connect(self._apply)
-        self.cancel_btn.clicked.connect(self._cancel)
 
     # =====================================================
     # CREATE WIDGET
@@ -120,14 +131,17 @@ class PropertyEditorView(QWidget):
 
         elif t == FieldType.FLOAT:
             w = QDoubleSpinBox()
-            w.setDecimals(4)
+            w.setDecimals(2)
 
             if field.min is not None:
-                w.setMinimum(field.min)
+                w.setMinimum(float(field.min))
+
             if field.max is not None:
-                w.setMaximum(field.max)
-            if field.step is not None:
-                w.setSingleStep(field.step)
+                w.setMaximum(float(field.max))
+
+            w.setSingleStep(
+                float(field.step or 0.1)
+            )
 
             return w
 
@@ -273,7 +287,6 @@ class PropertyEditorView(QWidget):
                 widget.setCurrentIndex(idx)
 
         elif t == FieldType.COLOR:
-
             widget.label.setText(str(value))
             self._set_button_color(widget.button, widget.label, str(value))
 
@@ -312,19 +325,18 @@ class PropertyEditorView(QWidget):
     # =====================================================
 
     def _clear_layout(self):
+        self._delete_layout_items(self.layout)
 
-        while self.layout.count():
+    def _delete_layout_items(self, layout):
 
-            item = self.layout.takeAt(0)
+        while layout.count():
+
+            item = layout.takeAt(0)
 
             widget = item.widget()
             if widget:
                 widget.deleteLater()
 
-            layout = item.layout()
-            if layout:
-                while layout.count():
-                    sub = layout.takeAt(0)
-                    w = sub.widget()
-                    if w:
-                        w.deleteLater()
+            child_layout = item.layout()
+            if child_layout:
+                self._delete_layout_items(child_layout)
