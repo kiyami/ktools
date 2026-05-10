@@ -35,7 +35,7 @@ class AppController:
         self.canvas_view = self.home_view.get_canvas_view()
         self.analysis_view = self.home_view.get_analysis_view()
 
-        self.settings_dialog = SettingsDialog()
+        self.settings_dialog = SettingsDialog(parent=self.home_view)
 
     def _init_viewmodels(self):
         self.data_service = DataService()
@@ -198,6 +198,11 @@ class AppController:
 
     def _open_settings_dialog(self):
 
+        if self.settings_dialog.isVisible():
+            self.settings_dialog.raise_()
+            self.settings_dialog.activateWindow()
+            return
+        
         canvas = self.canvas_view.canvas
         figure = self.canvas_view.figure
         ax = self.canvas_view.ax

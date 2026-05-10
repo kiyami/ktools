@@ -131,5 +131,3 @@ class CanvasPanel(QWidget):
     def request_settings(self):
         if self.plot_list.count() != 0:
             self.settings_button_clicked.emit()
-
-
