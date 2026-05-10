@@ -14,7 +14,7 @@ class CanvasPanel(QWidget):
     reset_requested = Signal()
     artist_plotted = Signal(object)
 
-    settings_button_clicked = Signal(int)
+    settings_button_clicked = Signal()
 
     def __init__(self):
         super().__init__()
@@ -129,8 +129,7 @@ class CanvasPanel(QWidget):
         self.canvas_view.redraw()
 
     def request_settings(self):
-        index = self.get_row()
-        if index >= 0:
-            self.settings_button_clicked.emit(index)
+        if self.plot_list.count() != 0:
+            self.settings_button_clicked.emit()
 
 
