@@ -100,9 +100,23 @@ AXIS_SETTINGS_CONFIG = [
         key="numeric_size",
         label="Numeric Size",
         field_type=FieldType.INT,
-        default=10,
+        default=12,
         min=1,
         max=40,
+        step=1,
+    ),
+
+    # =====================================================
+    # LABEL SIZE
+    # =====================================================
+
+    SettingField(
+        key="label_size",
+        label="Label Size",
+        field_type=FieldType.INT,
+        default=12,
+        min=1,
+        max=72,
         step=1,
     ),
 

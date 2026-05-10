@@ -93,10 +93,13 @@ class AxisAdapter(BaseAdapter):
             return AxisAdapter._format(ax.get_ylim()[1])
 
         if key == "tick_size":
-            return 10
+            return 12
 
         if key == "numeric_size":
-            return 10
+            return 12
+        
+        if key == "label_size":
+            return int(ax.xaxis.label.get_fontsize())
 
         return None
 
@@ -141,6 +144,24 @@ class AxisAdapter(BaseAdapter):
         elif key == "numeric_size":
             try:
                 ax.tick_params(axis="both", labelsize=float(value))
+            except Exception:
+                pass
+
+        elif key == "label_size":
+
+            try:
+                size = float(value)
+
+                ax.title.set_fontsize(size)
+
+                ax.xaxis.label.set_fontsize(size)
+                ax.yaxis.label.set_fontsize(size)
+
+                legend = ax.get_legend()
+
+                if legend:
+                    legend.prop.set_size(size)
+
             except Exception:
                 pass
 

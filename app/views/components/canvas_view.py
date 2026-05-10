@@ -130,6 +130,7 @@ class CanvasView(QWidget):
         if any(labels):
             self.ax.legend()
 
+        self.figure.tight_layout()
         self.canvas.draw()
 
         self.artist_plotted.emit(artist_item)
@@ -139,7 +140,8 @@ class CanvasView(QWidget):
         _, labels = self.ax.get_legend_handles_labels()
         if any(labels):
             self.ax.legend()
-            
+
+        self.figure.tight_layout()
         self.canvas.draw_idle()
 
     def reset(self):
