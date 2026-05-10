@@ -1,6 +1,6 @@
 # app/views/property_editor_view.py
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
     QWidget,
     QLabel,
@@ -47,26 +47,17 @@ class PropertyEditorView(QWidget):
     # =====================================================
 
     def _build_ui(self):
-
         self.layout = QGridLayout()
-
         self.setLayout(self.layout)
 
     # =====================================================
     # LOAD
     # =====================================================
 
-    def load(
-        self,
-        target,
-        config,
-        adapter,
-    ):
-
+    def load(self, target, config, adapter):
         self.target = target
         self.config = config
         self.adapter = adapter
-
         self._rebuild()
 
     # =====================================================
@@ -82,31 +73,17 @@ class PropertyEditorView(QWidget):
 
         row = 0
 
-        # -------------------------------------------------
-        # FIELDS
-        # -------------------------------------------------
-
         for field in self.config:
 
             label = QLabel(field.label)
-
             widget = self._create_widget(field)
 
-            # existing value
-            value = self.adapter.get(
-                self.target,
-                field.key,
-            )
+            value = self.adapter.get(self.target, field.key)
 
-            # fallback to default
             if value is None:
                 value = field.default
 
-            self._set_widget_value(
-                widget,
-                field,
-                value,
-            )
+            self._set_widget_value(widget, field, value)
 
             self.field_labels[field.key] = label
             self.field_widgets[field.key] = widget
@@ -116,10 +93,7 @@ class PropertyEditorView(QWidget):
 
             row += 1
 
-        # -------------------------------------------------
-        # BUTTONS
-        # -------------------------------------------------
-
+        # buttons
         btn_layout = QHBoxLayout()
 
         self.apply_btn = QPushButton("Apply")
@@ -129,10 +103,6 @@ class PropertyEditorView(QWidget):
         btn_layout.addWidget(self.cancel_btn)
 
         self.layout.addLayout(btn_layout, row, 0, 1, 2)
-
-        # -------------------------------------------------
-        # SIGNALS
-        # -------------------------------------------------
 
         self.apply_btn.clicked.connect(self._apply)
         self.cancel_btn.clicked.connect(self._cancel)
@@ -145,65 +115,36 @@ class PropertyEditorView(QWidget):
 
         t = field.field_type
 
-        # -------------------------------------------------
-        # TEXT
-        # -------------------------------------------------
-
         if t == FieldType.TEXT:
-
             return QLineEdit()
 
-        # -------------------------------------------------
-        # FLOAT
-        # -------------------------------------------------
-
         elif t == FieldType.FLOAT:
-
             w = QDoubleSpinBox()
-
             w.setDecimals(4)
 
             if field.min is not None:
                 w.setMinimum(field.min)
-
             if field.max is not None:
                 w.setMaximum(field.max)
-
             if field.step is not None:
                 w.setSingleStep(field.step)
 
             return w
 
-        # -------------------------------------------------
-        # INT
-        # -------------------------------------------------
-
         elif t == FieldType.INT:
-
             w = QSpinBox()
 
             if field.min is not None:
                 w.setMinimum(int(field.min))
-
             if field.max is not None:
                 w.setMaximum(int(field.max))
 
             return w
 
-        # -------------------------------------------------
-        # BOOL
-        # -------------------------------------------------
-
         elif t == FieldType.BOOL:
-
             return QCheckBox()
 
-        # -------------------------------------------------
-        # COMBO
-        # -------------------------------------------------
-
         elif t == FieldType.COMBO:
-
             w = QComboBox()
 
             if field.options:
@@ -212,23 +153,40 @@ class PropertyEditorView(QWidget):
 
             return w
 
-        # -------------------------------------------------
-        # COLOR
-        # -------------------------------------------------
+        # =====================================================
+        # COLOR (NEW STRUCTURE)
+        # =====================================================
 
         elif t == FieldType.COLOR:
 
-            w = QPushButton()
+            container = QWidget()
+            layout = QHBoxLayout()
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setSpacing(8)
 
-            w.clicked.connect(
-                lambda _, btn=w: self._pick_color(btn)
+            button = QPushButton()
+            button.setFixedWidth(50)
+            button.setMinimumHeight(24)
+
+            label = QLabel()
+            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            #label.setStyleSheet("font-family: monospace;")
+
+            button.clicked.connect(
+                lambda _, btn=button, lbl=label:
+                self._pick_color(btn, lbl)
             )
 
-            return w
+            layout.addWidget(button)
+            layout.addWidget(label)
+            layout.addStretch()
 
-        # -------------------------------------------------
-        # FALLBACK
-        # -------------------------------------------------
+            container.setLayout(layout)
+
+            container.button = button
+            container.label = label
+
+            return container
 
         return QLineEdit()
 
@@ -244,17 +202,9 @@ class PropertyEditorView(QWidget):
         for field in self.config:
 
             widget = self.field_widgets[field.key]
+            value = self._get_widget_value(widget, field)
 
-            value = self._get_widget_value(
-                widget,
-                field,
-            )
-
-            self.adapter.set(
-                self.target,
-                field.key,
-                value,
-            )
+            self.adapter.set(self.target, field.key, value)
 
         self.applied.emit()
 
@@ -263,9 +213,7 @@ class PropertyEditorView(QWidget):
     # =====================================================
 
     def _cancel(self):
-
         self.hide()
-
         self.canceled.emit()
 
     # =====================================================
@@ -276,53 +224,23 @@ class PropertyEditorView(QWidget):
 
         t = field.field_type
 
-        # -------------------------------------------------
-        # TEXT
-        # -------------------------------------------------
-
         if t == FieldType.TEXT:
-
             return widget.text()
-
-        # -------------------------------------------------
-        # FLOAT
-        # -------------------------------------------------
 
         elif t == FieldType.FLOAT:
-
             return widget.value()
-
-        # -------------------------------------------------
-        # INT
-        # -------------------------------------------------
 
         elif t == FieldType.INT:
-
             return widget.value()
 
-        # -------------------------------------------------
-        # BOOL
-        # -------------------------------------------------
-
         elif t == FieldType.BOOL:
-
             return widget.isChecked()
 
-        # -------------------------------------------------
-        # COMBO
-        # -------------------------------------------------
-
         elif t == FieldType.COMBO:
-
             return widget.currentData()
 
-        # -------------------------------------------------
-        # COLOR
-        # -------------------------------------------------
-
         elif t == FieldType.COLOR:
-
-            return widget.text()
+            return widget.label.text()
 
         return None
 
@@ -330,99 +248,54 @@ class PropertyEditorView(QWidget):
     # SET VALUE
     # =====================================================
 
-    def _set_widget_value(
-        self,
-        widget,
-        field,
-        value,
-    ):
+    def _set_widget_value(self, widget, field, value):
 
         if value is None:
             return
 
         t = field.field_type
 
-        # -------------------------------------------------
-        # TEXT
-        # -------------------------------------------------
-
         if t == FieldType.TEXT:
-
             widget.setText(str(value))
 
-        # -------------------------------------------------
-        # FLOAT
-        # -------------------------------------------------
-
         elif t == FieldType.FLOAT:
-
             widget.setValue(float(value))
 
-        # -------------------------------------------------
-        # INT
-        # -------------------------------------------------
-
         elif t == FieldType.INT:
-
             widget.setValue(int(value))
 
-        # -------------------------------------------------
-        # BOOL
-        # -------------------------------------------------
-
         elif t == FieldType.BOOL:
-
             widget.setChecked(bool(value))
 
-        # -------------------------------------------------
-        # COMBO
-        # -------------------------------------------------
-
         elif t == FieldType.COMBO:
-
             idx = widget.findData(value)
-
             if idx >= 0:
                 widget.setCurrentIndex(idx)
 
-        # -------------------------------------------------
-        # COLOR
-        # -------------------------------------------------
-
         elif t == FieldType.COLOR:
 
-            widget.setText(str(value))
-
-            self._set_button_color(
-                widget,
-                str(value),
-            )
+            widget.label.setText(str(value))
+            self._set_button_color(widget.button, widget.label, str(value))
 
     # =====================================================
     # COLOR PICKER
     # =====================================================
 
-    def _pick_color(self, button):
+    def _pick_color(self, button, label):
 
         color = QColorDialog.getColor()
-
         if not color.isValid():
             return
 
         hex_color = color.name()
 
-        button.setText(hex_color)
+        self._set_button_color(button, label, hex_color)
 
-        self._set_button_color(
-            button,
-            hex_color,
-        )
+    # =====================================================
+    # COLOR STYLE
+    # =====================================================
 
-    def _set_button_color(
-        self,
-        button,
-        color,
-    ):
+    def _set_button_color(self, button, label, color):
 
         button.setStyleSheet(f"""
             QPushButton {{
@@ -431,6 +304,8 @@ class PropertyEditorView(QWidget):
                 min-height: 24px;
             }}
         """)
+
+        label.setText(color)
 
     # =====================================================
     # CLEAR
@@ -443,19 +318,13 @@ class PropertyEditorView(QWidget):
             item = self.layout.takeAt(0)
 
             widget = item.widget()
-
-            if widget is not None:
+            if widget:
                 widget.deleteLater()
 
-            child_layout = item.layout()
-
-            if child_layout is not None:
-
-                while child_layout.count():
-
-                    child_item = child_layout.takeAt(0)
-
-                    child_widget = child_item.widget()
-
-                    if child_widget is not None:
-                        child_widget.deleteLater()
+            layout = item.layout()
+            if layout:
+                while layout.count():
+                    sub = layout.takeAt(0)
+                    w = sub.widget()
+                    if w:
+                        w.deleteLater()
