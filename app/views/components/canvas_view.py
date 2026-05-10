@@ -136,5 +136,11 @@ class CanvasView(QWidget):
         self.figure.set_facecolor("white")
         self.ax.clear()
         self.redraw()
-        
 
+    def savefig(self, file_path, dpi=300, bbox_inches="tight"):
+        self.figure.savefig(
+            fname=file_path, 
+            dpi=dpi, 
+            bbox_inches=bbox_inches,
+        )
+        

@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QToolButton,
     QWidget,
     QSizePolicy,
+    QFileDialog,
 )
 from PySide6.QtGui import QAction
 
@@ -17,6 +18,7 @@ class MainWindow(QMainWindow):
     open_requested = Signal()
     exit_requested = Signal()
     theme_toggled = Signal(bool)
+    save_requested = Signal()
 
     def __init__(self):
         super().__init__()
@@ -59,6 +61,12 @@ class MainWindow(QMainWindow):
         toolbar.setMinimumHeight(30)
         toolbar.setIconSize(QSize(18, 18))
 
+        self.save_btn = QToolButton()
+        self.save_btn.setText("Save")
+        self.save_btn.setToolTip("Save Figure")
+
+        toolbar.addWidget(self.save_btn)
+
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         toolbar.addWidget(spacer)
@@ -71,6 +79,7 @@ class MainWindow(QMainWindow):
 
         # ✔ sadece signal emit
         self.theme_btn.toggled.connect(self.theme_toggled.emit)
+        self.save_btn.clicked.connect(self.save_requested.emit)
 
     def _on_theme_toggled(self, checked: bool):
         theme = Theme.DARK if checked else Theme.LIGHT

@@ -131,3 +131,7 @@ class CanvasPanel(QWidget):
     def request_settings(self):
         if self.plot_list.count() != 0:
             self.settings_button_clicked.emit()
+
+    def savefig(self, file_path, dpi):
+        self.canvas_view.savefig(file_path, dpi)
+

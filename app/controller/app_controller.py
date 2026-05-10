@@ -21,6 +21,8 @@ from app.config.plot_settings_config import PLOT_SETTINGS_CONFIG
 from app.config.axis_settings_config import AXIS_SETTINGS_CONFIG
 from app.config.figure_settings_config import FIGURE_SETTINGS_CONFIG
 
+from PySide6.QtWidgets import QFileDialog
+
 
 class AppController:
 
@@ -180,6 +182,7 @@ class AppController:
             self.canvas_view.redraw
         )
 
+
     # ---------------- WINDOW ----------------
     def bind_main_window(self, window):
         self.window = window
@@ -187,6 +190,8 @@ class AppController:
         window.open_requested.connect(self.table_vm.open_file_dialog)
         window.exit_requested.connect(window.close)
         window.theme_toggled.connect(self._on_theme_toggled)
+
+        window.save_requested.connect(self._on_save_requested)
 
     def _on_theme_toggled(self, checked: bool):
         theme = Theme.DARK if checked else Theme.LIGHT
@@ -261,6 +266,20 @@ class AppController:
         )
 
         self.settings_dialog.show()
+
+    def _on_save_requested(self):
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self.window,
+            "Save Figure",
+            "",
+            "PNG Files (*.png);;PDF Files (*.pdf);;SVG Files (*.svg)"
+        )
+
+        if not file_path:
+            return
+
+        self.canvas_view.savefig(file_path, dpi=300)
 
     def start(self):
         self._init_views()
