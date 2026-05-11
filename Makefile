@@ -1,50 +1,45 @@
-APP_NAME=ktools
-ENTRY=main.py
+APP_NAME = ktools
+ENTRY    = main.py
+PYI      = pyinstaller
 
-PYINSTALLER=pyinstaller
+ADD_DATA = \
+    --add-data "app/views/styles/themes:app/views/styles/themes" \
+    --add-data "app/resources:app/resources"
+
+PYI_COMMON = \
+    --clean \
+    --name $(APP_NAME) \
+    --collect-all matplotlib \
+    $(ADD_DATA)
+
+.PHONY: run build debug clean
+
+# =====================================================
+# RUN
+# =====================================================
+run:
+	python $(ENTRY)
+
+# =====================================================
+# BUILD (windowed)
+# =====================================================
+build:
+	$(PYI) $(PYI_COMMON) --windowed $(ENTRY)
+
+# =====================================================
+# DEBUG BUILD (console)
+# =====================================================
+debug:
+	$(PYI) $(PYI_COMMON) --console --name $(APP_NAME)_debug $(ENTRY)
 
 # =====================================================
 # CLEAN
 # =====================================================
-
 clean:
-	python -c "import shutil, os, glob; \
-	shutil.rmtree('build', ignore_errors=True); \
-	shutil.rmtree('dist', ignore_errors=True); \
-	[os.remove(f) for f in glob.glob('*.spec')]"
-
-# =====================================================
-# BUILD (macOS .app)
-# =====================================================
-
-build:
-	$(PYINSTALLER) \
-		--clean \
-		--windowed \
-		--name $(APP_NAME) \
-		--collect-all matplotlib \
-		--add-data "app/views/styles/themes:app/views/styles/themes" \
-		--add-data "app/resources:app/resources" \
-		$(ENTRY)
-
-# =====================================================
-# DEBUG BUILD (console açık)
-# =====================================================
-
-debug:
-	$(PYINSTALLER) \
-		--clean \
-		--windowed \
-		--console \
-		--name $(APP_NAME)_debug \
-		--collect-all matplotlib \
-		--add-data "app/views/styles/themes:app/views/styles/themes" \
-		--add-data "resources:resources" \
-		$(ENTRY)
-
-# =====================================================
-# RUN (source code)
-# =====================================================
-
-run:
-	python $(ENTRY)
+	rm -rf build/ dist/
+	find . -type f -name "*.spec" -delete
+	find . -type f -name "*.pyc"  -delete
+	find . -type d -name "__pycache__"  -exec rm -rf {} +
+	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type d -name "*.egg-info"    -exec rm -rf {} +
+	find . -type f -name ".DS_Store" -delete

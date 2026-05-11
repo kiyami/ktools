@@ -1,14 +1,14 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 
-class CanvasPanelView(QWidget):
+class DataPanelView(QWidget):
 
     def __init__(self):
         super().__init__()
 
         layout = QVBoxLayout()
 
-        main_widget = QLabel("CanvasPanel")
+        main_widget = QLabel("DataPanel")
 
         layout.addWidget(main_widget)
 

@@ -1,4 +1,8 @@
-/* ===== BASE ===== */
+/* =====================================================
+   DARK THEME
+   ===================================================== */
+
+/* ── Base ── */
 QWidget {
     background-color: #1e1f22;
     color: #e6e6e6;
@@ -6,134 +10,141 @@ QWidget {
     font-size: 13px;
 }
 
-/* ===== BUTTON ===== */
+/* ── Buttons ── */
 QPushButton {
     background-color: #2a2d31;
     border: 1px solid #3a3d42;
-    padding: 6px 10px;
     border-radius: 6px;
+    padding: 5px 10px;
+}
+QPushButton:hover   { background-color: #34373d; }
+QPushButton:pressed { background-color: #3d4046; }
+QPushButton:disabled { color: #555555; }
+
+/* ── Toolbar ── */
+QToolBar {
+    background-color: #1b1c1f;
+    border-bottom: 1px solid #2a2d31;
+    padding: 3px;
+    spacing: 3px;
+}
+QToolButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #e6e6e6;
+    padding: 4px 8px;
+}
+QToolButton:hover   { background-color: #2f3237; }
+QToolButton:pressed { background-color: #3a3d42; }
+QToolButton:checked { background-color: #40444b; }
+
+/* ── Inputs ── */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: #2a2d31;
+    border: 1px solid #3a3d42;
+    border-radius: 6px;
+    padding: 3px 6px;
+    color: #e6e6e6;
+}
+QLineEdit:focus, QTextEdit:focus {
+    border-color: #5a8adf;
 }
 
-QPushButton:hover {
-    background-color: #34373d;
+/* ── ComboBox ── */
+QComboBox {
+    background-color: #2a2d31;
+    border: 1px solid #3a3d42;
+    border-radius: 6px;
+    padding: 3px 6px;
+    min-height: 22px;
+    color: #e6e6e6;
+}
+QComboBox:disabled { color: #555555; }
+
+/* ── SpinBox ── */
+QSpinBox, QDoubleSpinBox {
+    background-color: #2a2d31;
+    border: 1px solid #3a3d42;
+    border-radius: 6px;
+    padding: 3px 6px;
+    color: #e6e6e6;
 }
 
-QPushButton:pressed {
-    background-color: #3d4046;
-}
-
-/* ===== TABLE ===== */
+/* ── Table ── */
 QTableView {
     background-color: #232427;
     gridline-color: #2f3237;
     border: 1px solid #3a3d42;
     alternate-background-color: #26282d;
 }
-
 QHeaderView::section {
     background-color: #2a2d31;
     border: none;
     padding: 4px;
+    font-weight: bold;
+    color: #e6e6e6;
 }
 
-/* ===== LIST ===== */
+/* ── List ── */
 QListWidget {
     background-color: #232427;
     border: 1px solid #3a3d42;
+    border-radius: 4px;
+}
+QListWidget::item:selected {
+    background-color: #3a5080;
+    color: #ffffff;
 }
 
-/* ===== INPUTS ===== */
-QLineEdit, QTextEdit {
-    background-color: #2a2d31;
+/* ── Splitter ── */
+QSplitter::handle {
+    background-color: #2b2b2b;
+    width: 2px;
+    height: 2px;
+}
+QSplitter::handle:hover { background-color: #3a3a3a; }
+
+/* ── Labels ── */
+QLabel {
+    min-height: 22px;
+    background-color: transparent;
+}
+QLabel:disabled { color: #555555; }
+
+/* ── GroupBox ── */
+QGroupBox {
     border: 1px solid #3a3d42;
     border-radius: 6px;
-    padding: 2px;
-    color: #e6e6e6;
+    margin-top: 8px;
+    padding-top: 8px;
+    font-weight: bold;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 8px;
+    color: #aaaaaa;
 }
 
-/* QLabel#dropArea {
-    border: 2px dashed #555;
-    border-radius: 8px;
-    color: #aaa;
-    padding: 6px;
-    background-color: transparent;
-} */
+/* ── ScrollArea ── */
+QScrollArea { border: none; }
 
-/* =========================
-   TOOLBAR
-   ========================= */
-
-QToolBar {
-    background-color: #1b1c1f;
-    border: 1px solid #2a2d31;
-    padding: 3px;
-}
-
-/* =========================
-   TOOLBUTTON
-   ========================= */
-
-QToolButton {
-    background-color: transparent;
-    border: none;
-    color: #e6e6e6;
-    padding: 2px;
-}
-
-QToolButton:hover {
-    background-color: #2f3237;
-    border-radius: 6px;
-}
-
-QToolButton:pressed {
-    background-color: #3a3d42;
-}
-
-QToolButton:checked {
-    background-color: #40444b;
-    border-radius: 6px;
-}
-
-
-/* =========================
-   CONSOLE - DARK
-   ========================= */
-
+/* ── Console (named widget) ── */
 QPlainTextEdit#consoleView {
     background-color: #1a1d21;
-
     border: 1px solid #3a3d42;
-    border-radius: 8px;
-
-    padding: 2px;
-
+    border-radius: 6px;
     color: #d8d8d8;
-
+    font-family: "Menlo", "Consolas", monospace;
+    font-size: 12px;
     selection-background-color: #40444b;
     selection-color: #ffffff;
 }
 
+/* ── Drop area (named label) ── */
 QLabel#dropArea {
-    border: 2px dashed #555;
+    border: 2px dashed #555555;
     border-radius: 8px;
-    color: #aaa;
-    padding: 6px;
-}
-
-QComboBox {
-    min-height: 22px;
-}
-
-QLabel {
-    min-height: 22px;
-}
-
-QSplitter::handle {
-    background-color: #2b2b2b;
-    width: 2px;   /* vertical splitter */
-    height: 2px;  /* horizontal splitter */
-}
-
-QSplitter::handle:hover {
-    background-color: #3a3a3a;
+    color: #aaaaaa;
+    background-color: transparent;
 }
