@@ -261,9 +261,9 @@ class AppController:
         # APPLY CALLBACK
         # =====================================================
         
-        self.settings_dialog.applied.connect(
-            canvas.draw_idle
-        )
+        # self.settings_dialog.applied.connect(
+        #     canvas.draw_idle
+        # )
 
         self.settings_dialog.show()
 

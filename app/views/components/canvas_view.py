@@ -38,6 +38,8 @@ class CanvasView(QWidget):
 
         if not plot_item.settings:
             settings = dict()
+        else:
+            settings = plot_item.settings
 
         if plot_item.plot_type == PlotType.LINE:
             artist = self.ax.plot(plot_item.x, plot_item.y, **settings)[0]

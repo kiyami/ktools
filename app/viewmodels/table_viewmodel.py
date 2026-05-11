@@ -15,7 +15,7 @@ class TableViewModel(QObject):
     data_loaded = Signal(object)
     data_removed = Signal(object)
 
-    selected_row_updated = Signal(object)
+    #selected_row_updated = Signal(object)
     selected_row_sended = Signal(int)
     update_selected_row = Signal(int)
     
@@ -124,7 +124,7 @@ class TableViewModel(QObject):
 
         dataset = self.data_service.get(row)
         self._set_data(dataset)
-        self.selected_row_updated.emit(dataset)
+        #self.selected_row_updated.emit(dataset)
         self.headers_sended.emit(dataset.headers)
 
     def send_message(self, message: str):

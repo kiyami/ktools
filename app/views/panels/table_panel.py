@@ -30,7 +30,7 @@ class TablePanel(QWidget):
         self.table_view = TableView()
 
         self.table_list = QListWidget()
-        self.table_list.setMinimumHeight(60)
+        self.table_list.setMaximumHeight(60)
         self.table_list.setMinimumHeight(40)
 
         self.remove_button = QPushButton("Remove Data")

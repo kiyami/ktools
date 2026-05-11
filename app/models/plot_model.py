@@ -30,7 +30,8 @@ class ArtistItem:
     settings: Dict = field(default_factory=dict)
 
     def remove(self):
-        self.obj.remove()
+        if self.obj:
+            self.obj.remove()
     
 # =========================================================
 # BASE
@@ -329,6 +330,8 @@ class PlotSelections:
     settings = Optional[dict]
 
     def __init__(self):
+        self.plot_type = None
+
         self.x = None
         self.y = None
 
@@ -350,7 +353,7 @@ class PlotSelections:
         self.settings[key] = value
 
     def add_settings(self, settings_dict):
-        for key,value in settings_dict:
+        for key,value in settings_dict.items():
             self.settings[key] = value
 
     def get_constructor(self):

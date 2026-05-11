@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("k-Tools")
-        self.resize(900, 700)
+        self.resize(1000, 700)
         self.setMinimumSize(700, 500)
 
         self._setup_menu()
@@ -80,16 +80,6 @@ class MainWindow(QMainWindow):
         # ✔ sadece signal emit
         self.theme_btn.toggled.connect(self.theme_toggled.emit)
         self.save_btn.clicked.connect(self.save_requested.emit)
-
-    def _on_theme_toggled(self, checked: bool):
-        theme = Theme.DARK if checked else Theme.LIGHT
-
-        self.theme_manager.apply(theme)
-
-        config = self.theme_manager.get_config()
-        self.theme_btn.setText(config.text)
-
-        self.theme_toggled.emit(checked)
 
     def set_theme_manager(self, theme_manager):
         self.theme_manager = theme_manager

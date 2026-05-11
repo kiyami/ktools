@@ -75,21 +75,3 @@ class CanvasViewModel(QObject):
     def request_settings_panel(self, index):
         artist_item = self.artist_list[index]
         self.settings_panel_requested.emit(artist_item)
-
-    # def open_settings_dialog(self, index):
-
-    #     artist_item = self.artist_list[index]
-
-    #     artist = artist_item.obj
-
-    #     plot_type = artist_item.plot_type
-
-    #     initial = artist.properties()
-
-    #     self.plot_settings_view.build(
-    #         plot_type=plot_type,
-    #         initial_values=initial
-    #     )
-
-    #     self.plot_settings_view.show()
-        

@@ -49,11 +49,11 @@ class HomeView(QWidget):
         splitter.addWidget(middle_widget)
         splitter.addWidget(right_widget)
 
-        splitter.setSizes([400, 900, 300])
+        splitter.setSizes([400, 900, 400])
 
         splitter.setStretchFactor(0, 4)  # right
         splitter.setStretchFactor(1, 9)  # middle
-        splitter.setStretchFactor(2, 3)  # left
+        splitter.setStretchFactor(2, 4)  # left
 
         layout.addWidget(splitter)
 

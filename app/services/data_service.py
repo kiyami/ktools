@@ -62,6 +62,7 @@ class DataService:
 
             if not raw:
                 dataset = Dataset(None, None, None, None, "Invalid file")
+                return dataset
 
             headers, data_rows = self._extract_header(raw)
 
