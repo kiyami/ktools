@@ -2,7 +2,7 @@ from pathlib import Path
 from enum import Enum
 from dataclasses import dataclass
 
-from app.config.paths import THEMES_DIR
+from app.config.paths import THEMES_PATH
 
 
 class Theme(Enum):
@@ -18,11 +18,11 @@ class ThemeConfig:
 
 THEMES = {
     Theme.LIGHT: ThemeConfig(
-        qss_path=THEMES_DIR / "light.qss",
+        qss_path=THEMES_PATH / "light.qss",
         text="Light ☀️",
     ),
     Theme.DARK: ThemeConfig(
-        qss_path=THEMES_DIR / "dark.qss",
+        qss_path=THEMES_PATH / "dark.qss",
         text="Dark 🌙",
     ),
 }
