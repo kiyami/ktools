@@ -1,4 +1,4 @@
-name: ktools
+name: ktools_env
 channels:
   - conda-forge
 dependencies:
