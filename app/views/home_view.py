@@ -12,17 +12,18 @@ class HomeView(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QHBoxLayout()
+        # panels
+        self.data_panel     = DataPanelView()
+        self.canvas_panel   = CanvasPanelView()
+        self.analysis_panel = AnalysisPanelView()
+        self.console        = ConsoleView()
 
-        self.data_panel = DataPanelView()
-        self.canvas_panel = CanvasPanelView()
+        # layout
+        layout = QHBoxLayout()
 
         # right panel ------------------------
         right_panel = QWidget()
         _sub_layout = QVBoxLayout()
-
-        self.analysis_panel = AnalysisPanelView()
-        self.console = ConsoleView()
 
         _sub_layout.addWidget(self.analysis_panel,5)
         _sub_layout.addWidget(self.console,1)
@@ -30,9 +31,14 @@ class HomeView(QWidget):
         right_panel.setLayout(_sub_layout)
         #--------------------------------------
 
-        layout.addWidget(self.data_panel,1)
-        layout.addWidget(self.canvas_panel,2)
-        layout.addWidget(right_panel,1)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        layout.addWidget(self.data_panel,   1)
+        layout.addWidget(self.canvas_panel, 2)
+        layout.addWidget(right_panel,       1)
 
         self.setLayout(layout)
+
+    def append_log(self, message: str):
+        self.console.append_text(message)
 

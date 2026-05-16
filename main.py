@@ -9,16 +9,11 @@ from app.views.main_window import MainWindow
 
 
 def main():
-    app = QApplication(sys.argv)
+    app        = QApplication(sys.argv)
+    window     = MainWindow()
+    controller = AppController(app, window)
 
-    controller = AppController(app)
-    view = controller.start()
-
-    window = MainWindow()
-    window.setCentralWidget(view)
-
-    controller.bind_main_window(window)
-
+    window.setCentralWidget(controller.home_view)
     window.show()
 
     sys.exit(app.exec())

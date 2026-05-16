@@ -7,18 +7,18 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 from PySide6.QtGui import QAction
-
 from PySide6.QtCore import Signal, QSize
 
 from app.services.theme_manager import Theme
 
 
 class MainWindow(QMainWindow):
-    # True = dark, False = light
+
     open_requested = Signal()
     exit_requested = Signal()
-    theme_toggled = Signal(bool)
     save_requested = Signal()
+
+    theme_toggled  = Signal(bool)
 
     def __init__(self):
         super().__init__()
