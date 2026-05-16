@@ -23,9 +23,9 @@ class DataPanelView(QWidget):
     def __init__(self):
         super().__init__()
 
-        # ---------------
+        # ---------------------------------------
         # items
-        # ---------------
+        # ---------------------------------------
         self.load_btn   = QPushButton("Load Data")
         self.remove_btn = QPushButton("Remove")
         self.reset_btn  = QPushButton("Reset")
@@ -34,16 +34,16 @@ class DataPanelView(QWidget):
         self.data_list      = ListView()
         self.drag_drop_area = DropLabel("Drag & Drop\nData File")
 
-        # ---------------
+        # ---------------------------------------
         # layout
-        # ---------------
+        # ---------------------------------------
 
         # header layout -------------------------
         header = QWidget()
         header_layout = QHBoxLayout()
 
         header_layout.addWidget(self.load_btn, 0)
-        header_layout.setContentsMargins(0,0,0,0)
+        header_layout.setContentsMargins(4,4,4,4)
 
         header.setLayout(header_layout)
 
@@ -70,7 +70,7 @@ class DataPanelView(QWidget):
         )
         content_layout.addWidget(bottom_btns, 0)
 
-        content_layout.setContentsMargins(0,0,0,0)
+        content_layout.setContentsMargins(4,4,4,4)
 
         self.content.setLayout(content_layout)
 
@@ -87,16 +87,19 @@ class DataPanelView(QWidget):
         main_layout.addWidget(self.drag_drop_area, 1)
         
         main_layout.setAlignment(Qt.AlignTop)
-        main_layout.setContentsMargins(0,0,0,0)
+        main_layout.setContentsMargins(4,4,4,4)
 
         self.setLayout(main_layout)
 
-        # ------------------
-        # signals
-        # ------------------
+        # binding -------------------------------
+        self._bind()
+
+    def _bind(self):
         self.load_btn.clicked.connect(self.load_btn_clicked.emit)
         self.remove_btn.clicked.connect(self.remove_data_by_index)
         self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
+
+        self.drag_drop_area.file_dropped.connect(self.file_dropped)
 
         self.data_list.currentRowChanged.connect(self.on_row_changed)
 
@@ -127,8 +130,8 @@ class DataPanelView(QWidget):
         self.data_table.clear()
         self.data_list.clear()
 
-    def set_visibility(self, n_list: int):
-        if n_list == 0:
+    def set_visibility(self, n_data: int):
+        if n_data == 0:
             self.content.setVisible(False)
         else:
             self.content.setVisible(True)

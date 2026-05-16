@@ -44,6 +44,9 @@ class HomeViewModel(QObject):
         # ── Cross-panel + console wiring ──────────────────
         self._connect_vms(home_view)
 
+        self._set_initial_state()
+        
+
 
     def _connect_vms(self, home_view: HomeView):
         # # data → canvas
@@ -61,6 +64,8 @@ class HomeViewModel(QObject):
 
         # all panels → console
         self.data_panel_vm.message_sent.connect(home_view.append_log)
-        # self.canvas_panel_vm.message_sent.connect(home_view.append_log)
-        # self.analysis_panel_vm.message_sent.connect(home_view.append_log)
+        self.canvas_panel_vm.message_sent.connect(home_view.append_log)
+        self.analysis_panel_vm.message_sent.connect(home_view.append_log)
  
+    def _set_initial_state(self):
+        self.data_panel_vm.update_visibility()

@@ -93,7 +93,7 @@ class DatasetTableModel(QAbstractTableModel):
     # HEADERS
     # =====================================================
 
-    def headerData(self, section, orientation, role):
+    def header_data(self, section, orientation, role):
 
         if role != Qt.DisplayRole:
             return None
@@ -125,7 +125,7 @@ class DatasetTableModel(QAbstractTableModel):
     # EDITING
     # =====================================================
 
-    def setData(self, index, value, role=Qt.EditRole):
+    def set_data(self, index, value, role=Qt.EditRole):
 
         if role != Qt.EditRole:
             return False

@@ -1,7 +1,6 @@
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog
 
-from app.models.dataset import Dataset
 from app.models.data_table_model import DatasetTableModel
 
 from app.services.data_service import DataService
@@ -10,7 +9,7 @@ from app.services.data_service import DataService
 class DataPanelViewModel(QObject):
 
     message_sent      = Signal(str)
-    update_visibility = Signal(int)
+    data_length_sent  = Signal(int)
 
     data_loaded       = Signal(object)
     data_removed      = Signal(object)
@@ -24,6 +23,10 @@ class DataPanelViewModel(QObject):
     def send_message(self, message: str):
         self.message_sent.emit(message)
 
+    def update_visibility(self):
+        n_data = self.data_service.count()
+        self.data_length_sent.emit(n_data)
+
     def get_model(self):
         return self.model
     
@@ -32,7 +35,7 @@ class DataPanelViewModel(QObject):
             print("Error:", dataset.error)
             return
 
-        self.model.set_data(dataset.raw_data, dataset.headers)
+        self.model.set_dataset(dataset)
     
     def open_file_dialog(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -54,8 +57,8 @@ class DataPanelViewModel(QObject):
 
             self.data_loaded.emit(self.data_service.get_all())
 
-            length = self.data_service.get_length()
-            self.update_visibility.emit(length)
+            length = self.data_service.count()
+            self.update_visibility()
 
             self.selected_row = length-1
             self.update_selected_row.emit(length-1)
@@ -69,14 +72,14 @@ class DataPanelViewModel(QObject):
     def remove_data(self, index):
 
         self.data_service.remove(index)
-        length = self.data_service.get_length()
+        length = self.data_service.count()
 
         if length > 0:
 
             dataset = self.data_service.get(length-1)
             self._set_data(dataset)
             self.data_removed.emit(self.data_service.get_all())
-            self.update_visibility.emit(length)
+            self.update_visibility()
 
             self.selected_row = length-1
             self.update_selected_row.emit(length-1)
@@ -88,14 +91,14 @@ class DataPanelViewModel(QObject):
         self.data_service.clear()
 
         self.table_resetted.emit()
-        self.update_visibility.emit(0)
+        self.update_visibility()
 
         self.model = DatasetTableModel()
         self.model_sent.emit(self.model)
 
     def update_row_and_table(self, row):
 
-        length = self.data_service.get_length()
+        length = self.data_service.count()
 
         if length == 0:
             self.reset_data()

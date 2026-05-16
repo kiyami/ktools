@@ -30,3 +30,7 @@ class DataPanelBinder:
         self.view.selected_row_changed.connect(
             self.vm.update_row_and_table
         )
+
+        self.vm.data_length_sent.connect(
+            self.view.set_visibility
+        )
