@@ -11,6 +11,3 @@ class ListView(QListWidget):
 
     def set_row(self, row_idx):
         self.setCurrentRow(row_idx)
-
-    def clear(self):
-        self.clear()

@@ -8,7 +8,7 @@ class DataService:
 
     def __init__(self):
         self._datasets: dict[str, Dataset] = {}
-        self._order: list[str] = []
+        self._order:    list[str]          = []
 
     # =========================
     # COLLECTION
@@ -39,10 +39,17 @@ class DataService:
 
         return key
 
-    def remove(self, key: str) -> None:
-        """
-        Dataset siler (dict + order sync)
-        """
+    def remove(self, key_or_index: str | int) -> None:
+
+        if isinstance(key_or_index, int):
+            index = key_or_index
+            key   = self._order[index]
+
+        elif isinstance(key_or_index, str):
+            key = key_or_index
+
+        else:
+            return
 
         if key in self._datasets:
             del self._datasets[key]
@@ -110,6 +117,8 @@ class DataService:
                 }
             )
 
+            self.add(dataset)
+
         except Exception as e:
             dataset = Dataset(
                 label=file_path.stem,
@@ -119,7 +128,6 @@ class DataService:
                 metadata={"status": "failed"}
             )
 
-        self.add(dataset)
         return dataset
 
     # =========================
