@@ -125,7 +125,7 @@ class DatasetTableModel(QAbstractTableModel):
     # EDITING
     # =====================================================
 
-    def set_data(self, index, value, role=Qt.EditRole):
+    def setData(self, index, value_str, role=Qt.EditRole):
 
         if role != Qt.EditRole:
             return False
@@ -133,8 +133,13 @@ class DatasetTableModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
 
+        print("set_data")
+        print(row,col,value_str)
+
         try:
-            self.dataframe.iat[row, col] = value
+            #_dtype = self.dataframe[col].dtype
+            _value = float(value_str)
+            self.dataframe.iat[row, col] = _value
 
             self.dataChanged.emit(
                 index,
@@ -144,7 +149,9 @@ class DatasetTableModel(QAbstractTableModel):
 
             return True
 
-        except Exception:
+        except Exception as e:
+            print("exception")
+            print(e)
             return False
 
     # =====================================================
