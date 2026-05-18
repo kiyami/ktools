@@ -11,14 +11,14 @@ from app.utils.helpers import hbox, vbox
 
 class DataPanelView(QWidget):
 
+    message_sent         = Signal(str)
+    file_path_sent       = Signal(object)
+
     load_btn_clicked     = Signal()
     remove_btn_clicked   = Signal(int)
     reset_btn_clicked    = Signal()
 
-    file_path_sent       = Signal(object)
     selected_row_changed = Signal(int)
-
-    message_sended       = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -94,33 +94,53 @@ class DataPanelView(QWidget):
         # binding -------------------------------
         self._bind()
 
+
+    # ---------------------------------------
+    # Private Methods
+    # ---------------------------------------
+
     def _bind(self):
-        self.load_btn.clicked.connect(self.open_file_dialog)
-        self.remove_btn.clicked.connect(self.remove_data_by_index)
+        self.load_btn.clicked.connect(self._open_file_dialog)
+        self.remove_btn.clicked.connect(self._remove_data_by_index)
         self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
 
         self.drag_drop_area.file_dropped.connect(self.file_path_sent.emit)
 
-        self.data_list.currentRowChanged.connect(self.on_row_changed)
+        self.data_list.currentRowChanged.connect(self._on_row_changed)
 
-    def send_message(self, message: str):
+    def _send_message(self, message: str):
         self.message_sended.emit(message)
+
+    def _get_row(self):
+        return self.data_list.get_row()
+
+    def _on_row_changed(self):
+        self.selected_row_changed.emit(self._get_row())
+
+    def _remove_data_by_index(self):
+        row_idx = self._get_row()
+        self.remove_btn_clicked.emit(row_idx)
+
+    def _open_file_dialog(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            None,
+            "Select File",
+            "",
+            "Data Files (*.txt *.csv *.tsv)"
+        )
+
+        if file_path:
+            self.file_path_sent.emit(file_path)
         
+    # ---------------------------------------
+    # Public Methods
+    # ---------------------------------------
+
     def set_model(self, model):
         self.data_table.set_model(model)
 
-    def get_row(self):
-        return self.data_list.get_row()
-    
     def set_row(self, row_idx):
         self.data_list.set_row(row_idx)
-
-    def on_row_changed(self):
-        self.selected_row_changed.emit(self.get_row())
-
-    def remove_data_by_index(self):
-        row_idx = self.get_row()
-        self.remove_btn_clicked.emit(row_idx)
 
     def update_list(self, keys: list):
         self.data_list.clear()
@@ -135,14 +155,3 @@ class DataPanelView(QWidget):
             self.content.setVisible(False)
         else:
             self.content.setVisible(True)
-
-    def open_file_dialog(self):
-        file_path, _ = QFileDialog.getOpenFileName(
-            None,
-            "Select File",
-            "",
-            "Data Files (*.txt *.csv *.tsv)"
-        )
-
-        if file_path:
-            self.file_path_sent.emit(file_path)
