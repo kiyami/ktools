@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from PySide6.QtCore import (
     QAbstractTableModel,
@@ -129,16 +130,19 @@ class DatasetTableModel(QAbstractTableModel):
 
         if role != Qt.EditRole:
             return False
+        
+        print(type(index))
 
         row = index.row()
         col = index.column()
 
-        print("set_data")
-        print(row,col,value_str)
-
         try:
-            #_dtype = self.dataframe[col].dtype
-            _value = float(value_str)
+
+            if value_str == "":
+                _value = np.nan
+            else:
+                _value = float(value_str)
+
             self.dataframe.iat[row, col] = _value
 
             self.dataChanged.emit(
@@ -146,6 +150,8 @@ class DatasetTableModel(QAbstractTableModel):
                 index,
                 [Qt.DisplayRole]
             )
+
+            self._dataset.add_history(_value, index)
 
             return True
 
